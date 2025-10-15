@@ -1,0 +1,9 @@
+services:
+  webserver:
+    build: .
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - ./certificates/localhost.pem:/etc/ssl/certs/localhost.pem:ro
+      - ./certificates/localhost-key.pem:/etc/ssl/private/localhost-key.pem:ro
