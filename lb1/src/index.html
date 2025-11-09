@@ -1,12 +1,49 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tetris</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Тетрис</title>
+    <link href="style.css" rel="stylesheet">
 </head>
 <body>
-<h1>Hello, world!</h1>
+<main>
+    <div class="left-column">
+        <div class="help">
+            <strong>Управление</strong><br>
+            ←/A →/D — движение<br>
+            ↑/W — поворот<br>
+            ↓/S — сброс<br>
+            P — пауза
+        </div>
+        <table id="leaderboard">
+            <thead>
+            <tr>
+                <th>Имя</th>
+                <th>Очки</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div class="game-column">
+        <canvas aria-label="игровое поле" height="400" id="gameCanvas" width="200"></canvas>
+        <div id="overlay"></div>
+    </div>
+
+    <div class="right-column">
+        <div id="score">Очки: 0</div>
+        <div id="level">Уровень: 1</div>
+        <div>
+            <label for="playerName">Имя:</label>
+            <input id="playerName" placeholder="Игрок">
+            <button id="startGame">Начать игру</button>
+        </div>
+        <div>Следующая фигура:</div>
+        <canvas height="80" id="nextCanvas" width="80"></canvas>
+    </div>
+</main>
 <script src="main.js"></script>
 </body>
 </html>
