@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Домашняя библиотека</title>
+    <!-- W3.CSS -->
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body class="w3-light-grey">
+<div class="w3-bar w3-dark-grey w3-padding">
+    <a href="/books" class="w3-bar-item w3-button"><i class="fa fa-book"></i> Библиотека</a>
+    <div class="w3-right">
+        <% if (currentUser) { %>
+            <span class="w3-bar-item">Привет, <%= currentUser.displayName %></span>
+            <a href="/logout" class="w3-bar-item w3-button"><i class="fa fa-sign-out-alt"></i> Выйти</a>
+        <% } else { %>
+            <a href="/login" class="w3-bar-item w3-button"><i class="fa fa-sign-in-alt"></i> Войти</a>
+        <% } %>
+    </div>
+</div>
+
+<div class="w3-container w3-margin-top">
+    <% if (messages && messages.error) { %>
+        <div class="w3-panel w3-pale-red w3-border">
+            <ul>
+                <% messages.error.forEach(function(m){ %><li><%= m %></li><% }); %>
+            </ul>
+        </div>
+    <% } %>
+
+    <%- body %>
+</div>
+
+<script src="/public/js/books.js" defer></script>
+</body>
+</html>

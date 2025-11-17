@@ -1,0 +1,212 @@
+[
+  {
+    "id": "book-001",
+    "title": "Война и мир",
+    "author": "Лев Толстой",
+    "year": "1869",
+    "available": true,
+    "holder": null,
+    "dueDate": null,
+    "cover": null
+  },
+  {
+    "id": "book-002",
+    "title": "Преступление и наказание",
+    "author": "Фёдор Достоевский",
+    "year": "1866",
+    "available": false,
+    "holder": "Иван Иванов",
+    "dueDate": "2025-11-25",
+    "cover": null
+  },
+  {
+    "id": "book-003",
+    "title": "Мастер и Маргарита",
+    "author": "Михаил Булгаков",
+    "year": "1966",
+    "available": true,
+    "holder": null,
+    "dueDate": null,
+    "cover": null
+  },
+  {
+    "id": "book-004",
+    "title": "Анна Каренина",
+    "author": "Лев Толстой",
+    "year": "1878",
+    "available": false,
+    "holder": "Пётр Петров",
+    "dueDate": "2025-11-10",
+    "cover": null
+  },
+  {
+    "id": "book-005",
+    "title": "Идиот",
+    "author": "Фёдор Достоевский",
+    "year": "1869",
+    "available": true,
+    "holder": null,
+    "dueDate": null,
+    "cover": null
+  },
+  {
+    "id": "book-006",
+    "title": "Маленький принц",
+    "author": "Антуан де Сент-Экзюпери",
+    "year": "1943",
+    "available": false,
+    "holder": "Ольга Смирнова",
+    "dueDate": "2025-12-01",
+    "cover": null
+  },
+  {
+    "id": "book-007",
+    "title": "1984",
+    "author": "Джордж Оруэлл",
+    "year": "1949",
+    "available": true,
+    "holder": null,
+    "dueDate": null,
+    "cover": null
+  },
+  {
+    "id": "book-008",
+    "title": "Сто лет одиночества",
+    "author": "Габриэль Гарсия Маркес",
+    "year": "1967",
+    "available": true,
+    "holder": null,
+    "dueDate": null,
+    "cover": null
+  },
+  {
+    "id": "book-009",
+    "title": "Улисс",
+    "author": "Джеймс Джойс",
+    "year": "1922",
+    "available": false,
+    "holder": "Мария Кузнецова",
+    "dueDate": "2025-10-30",
+    "cover": null
+  },
+  {
+    "id": "book-010",
+    "title": "Принц",
+    "author": "Никколо Макиавелли",
+    "year": "1532",
+    "available": true,
+    "holder": null,
+    "dueDate": null,
+    "cover": null
+  },
+  {
+    "id": "book-011",
+    "title": "О дивный новый мир",
+    "author": "Олдос Хаксли",
+    "year": "1932",
+    "available": true,
+    "holder": null,
+    "dueDate": null,
+    "cover": null
+  },
+  {
+    "id": "book-012",
+    "title": "Братья Карамазовы",
+    "author": "Фёдор Достоевский",
+    "year": "1880",
+    "available": false,
+    "holder": "Сергей Лебедев",
+    "dueDate": "2025-11-18",
+    "cover": null
+  },
+  {
+    "id": "book-013",
+    "title": "Маятник Фуко",
+    "author": "Умберто Эко",
+    "year": "1988",
+    "available": true,
+    "holder": null,
+    "dueDate": null,
+    "cover": null
+  },
+  {
+    "id": "book-014",
+    "title": "Над пропастью во ржи",
+    "author": "Дж. Д. Сэлинджер",
+    "year": "1951",
+    "available": true,
+    "holder": null,
+    "dueDate": null,
+    "cover": null
+  },
+  {
+    "id": "book-015",
+    "title": "Властелин колец: Братство Кольца",
+    "author": "Дж. Р. Р. Толкин",
+    "year": "1954",
+    "available": false,
+    "holder": "Алексей Морозов",
+    "dueDate": "2025-11-05",
+    "cover": null
+  },
+  {
+    "id": "book-016",
+    "title": "Дон Кихот",
+    "author": "Мигель де Сервантес",
+    "year": "1605",
+    "available": true,
+    "holder": null,
+    "dueDate": null,
+    "cover": null
+  },
+  {
+    "id": "book-017",
+    "title": "Процесс",
+    "author": "Франц Кафка",
+    "year": "1925",
+    "available": true,
+    "holder": null,
+    "dueDate": null,
+    "cover": null
+  },
+  {
+    "id": "book-018",
+    "title": "Шум и ярость",
+    "author": "Уильям Фолкнер",
+    "year": "1929",
+    "available": true,
+    "holder": null,
+    "dueDate": null,
+    "cover": null
+  },
+  {
+    "id": "book-019",
+    "title": "Моби Дик",
+    "author": "Герман Мелвилл",
+    "year": "1851",
+    "available": false,
+    "holder": "Екатерина Сергеева",
+    "dueDate": "2025-12-15",
+    "cover": null
+  },
+  {
+    "id": "book-020",
+    "title": "Коллекция стихов",
+    "author": "Александр Пушкин",
+    "year": "1837",
+    "available": true,
+    "holder": null,
+    "dueDate": null,
+    "cover": null
+  },
+  {
+    "id": "ed03568b-5003-40d7-8987-983ab0d7a620",
+    "title": "Test",
+    "author": "Test",
+    "year": "2025",
+    "available": false,
+    "holder": "Федор",
+    "dueDate": "2025-11-20",
+    "cover": null
+  }
+]

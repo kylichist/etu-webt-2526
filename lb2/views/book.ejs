@@ -1,0 +1,133 @@
+<div class="w3-row">
+    <div class="w3-col m8">
+        <h2><%= book ? 'Карточка книги' : 'Добавить книгу' %></h2>
+
+        <form action="<%= book ? ('/books/' + book.id) : '/books' %>" method="post" enctype="multipart/form-data" class="w3-container w3-card w3-padding">
+            <p>
+                <label>Название</label>
+                <input class="w3-input" name="title" value="<%= book ? book.title : '' %>">
+            </p>
+            <p>
+                <label>Автор</label>
+                <input class="w3-input" name="author" value="<%= book ? book.author : '' %>">
+            </p>
+            <p>
+                <label>Год выпуска</label>
+                <input class="w3-input" name="year" value="<%= book ? book.year : '' %>">
+            </p>
+            <p>
+                <label>Обложка (jpg/png)</label>
+                <input type="file" name="cover" accept="image/*">
+            </p>
+
+            <div class="w3-margin-top">
+                <button class="w3-button w3-blue" type="submit"><i class="fa fa-save"></i> Сохранить</button>
+                <a href="/books" class="w3-button w3-light-grey">Назад</a>
+
+                <% if (book) { %>
+                    <!-- Checkout / Return buttons -->
+                    <% if (book.available) { %>
+                        <button id="openCheckout" type="button" class="w3-button w3-green"><i class="fa fa-hand-paper"></i> Выдать</button>
+                    <% } else { %>
+                        <form id="returnForm" style="display:inline" method="post" action="/api/books/<%= book.id %>/return?_method=POST"></form>
+                        <button id="doReturn" type="button" class="w3-button w3-orange"><i class="fa fa-undo"></i> Вернуть</button>
+                    <% } %>
+                <% } %>
+            </div>
+        </form>
+    </div>
+
+    <div class="w3-col m4">
+        <div class="w3-card w3-padding">
+            <h3>Статус</h3>
+            <% if (book) { %>
+                <p><strong><%= book.title %></strong></p>
+                <p>Автор: <%= book.author %></p>
+                <p>Год: <%= book.year %></p>
+                <p>В библиотеке: <%= book.available ? 'Да' : 'Нет' %></p>
+                <% if (!book.available) { %>
+                    <p>Взял: <strong><%= book.holder %></strong></p>
+                    <p>Должен вернуть: <strong><%= book.dueDate %></strong></p>
+                <% } %>
+                <% if (book.cover) { %>
+                    <img src="<%= book.cover %>" alt="cover" style="max-width:100%">
+                <% } else { %>
+                    <div class="w3-center w3-padding-16 w3-light-grey">Нет обложки</div>
+                <% } %>
+                <form id="deleteForm" method="post" action="/api/books/<%= book.id %>?_method=DELETE"></form>
+                <button id="deleteBtn" class="w3-button w3-red w3-margin-top"><i class="fa fa-trash"></i> Удалить книгу</button>
+            <% } else { %>
+                <div class="w3-center w3-text-grey">Сохраните книгу, затем можно будет выдать/удалить.</div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<!-- Checkout dialog -->
+<dialog id="checkoutDialog">
+    <form method="dialog" class="w3-container">
+        <h3>Выдать книгу</h3>
+        <p>
+            <label>Имя читателя</label>
+            <input id="holderName" class="w3-input" required>
+        </p>
+        <p>
+            <label>Дата возврата</label>
+            <input id="dueDate" type="date" class="w3-input" required>
+        </p>
+        <div class="w3-right">
+            <button id="checkoutCancel" class="w3-button w3-light-grey">Отмена</button>
+            <button id="checkoutOk" class="w3-button w3-green">Выдать</button>
+        </div>
+    </form>
+</dialog>
+
+<script>
+    (function(){
+        const bookId = "<%= book ? book.id : '' %>";
+        const deleteBtn = document.getElementById('deleteBtn');
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', async () => {
+                if (confirm('Удалить книгу?')) {
+                    const resp = await fetch('/api/books/' + bookId, { method: 'DELETE' });
+                    if (resp.ok) location.href = '/books';
+                    else alert('Ошибка при удалении');
+                }
+            });
+        }
+
+        const openCheckout = document.getElementById('openCheckout');
+        if (openCheckout) {
+            openCheckout.addEventListener('click', () => {
+                document.getElementById('checkoutDialog').showModal();
+            });
+        }
+        const checkoutOk = document.getElementById('checkoutOk');
+        if (checkoutOk) {
+            checkoutOk.addEventListener('click', async () => {
+                const holder = document.getElementById('holderName').value.trim();
+                const dueDate = document.getElementById('dueDate').value;
+                if (!holder || !dueDate) { alert('Заполните данные'); return; }
+                const resp = await fetch('/api/books/' + bookId + '/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ holder, dueDate })
+                });
+                if (resp.ok) location.reload();
+                else {
+                    const err = await resp.json();
+                    alert('Ошибка: ' + (err.error||''));
+                }
+            });
+        }
+
+        const doReturn = document.getElementById('doReturn');
+        if (doReturn) {
+            doReturn.addEventListener('click', async () => {
+                const resp = await fetch('/api/books/' + bookId + '/return', { method: 'POST' });
+                if (resp.ok) location.reload();
+                else alert('Ошибка при возврате');
+            });
+        }
+    })();
+</script>

@@ -1,0 +1,55 @@
+<div class="w3-row">
+    <div class="w3-col m8 l9">
+        <h2>Список книг</h2>
+
+        <div class="w3-card w3-padding w3-margin-bottom">
+            <form id="filterForm" class="w3-row-padding">
+                <div class="w3-col s12 m4">
+                    <label>Поиск (автор/название)</label>
+                    <input id="search" class="w3-input" name="search" placeholder="Например: Толстой">
+                </div>
+                <div class="w3-col s6 m2">
+                    <label>В наличии</label>
+                    <select id="available" class="w3-select" name="available">
+                        <option value="">Любой</option>
+                        <option value="true">Да</option>
+                        <option value="false">Нет</option>
+                    </select>
+                </div>
+                <div class="w3-col s6 m3">
+                    <label>Должны вернуть до</label>
+                    <input id="dueBefore" type="date" class="w3-input" name="dueBefore">
+                </div>
+                <div class="w3-col s12 m3 w3-center" style="padding-top: 22px;">
+                    <button id="applyFilter" class="w3-button w3-blue"><i class="fa fa-filter"></i> Фильтровать</button>
+                    <button id="resetFilter" type="button" class="w3-button w3-light-grey">Сбросить</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="booksList" class="w3-row-padding"></div>
+    </div>
+
+    <div class="w3-col m4 l3">
+        <div class="w3-card w3-padding">
+            <h3>Управление</h3>
+            <p>
+                <a href="/books/new" class="w3-button w3-green"><i class="fa fa-plus"></i> Добавить книгу</a>
+            </p>
+            <p>
+                Для операций добавления/редактирования/удаления требуется вход.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Dialogs for confirmation -->
+<dialog id="confirmDialog">
+    <form method="dialog" class="w3-container">
+        <p id="confirmText">Вы уверены?</p>
+        <div class="w3-right">
+            <button id="confirmCancel" class="w3-button w3-light-grey">Отмена</button>
+            <button id="confirmOk" class="w3-button w3-red">Удалить</button>
+        </div>
+    </form>
+</dialog>
