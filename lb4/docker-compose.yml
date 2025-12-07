@@ -4,13 +4,13 @@ version: '3.8'
 services:
   # Админ-панель lb3
   lb3-admin:
-    build: ./lb3
+    build: ../lb3
     container_name: lb3-admin
     ports:
       - "3000:3000"
     volumes:
       - shared-data:/app/data
-      - ./lb3/public:/app/public
+      - ../lb3/public:/app/public
     environment:
       - NODE_ENV=production
       - PORT=3000
@@ -21,7 +21,7 @@ services:
 
   # Пользовательское приложение lb4
   lb4-user:
-    build: ./lb4
+    build: .
     container_name: lb4-user
     ports:
       - "4200:4200"  # Angular статические файлы (если нужно отдельно)
