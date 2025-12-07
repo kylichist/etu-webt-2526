@@ -40,3 +40,8 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Uploaded files
+/uploads
+*.mp3
+!src/assets/sounds/.gitkeep
