@@ -1,0 +1,8 @@
+.idea
+certs
+
+node_modules
+build_webpack
+build_gulp
+.env
+.DS_Store

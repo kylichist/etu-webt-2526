@@ -1,0 +1,68 @@
+@use "sass:color";
+
+$primary: #0d6efd;
+$muted: #6c757d;
+$bg: #f4f7fb;
+$card-bg: #ffffff;
+$radius: 8px;
+$avatar-size: 56px;
+$avatar-lg-size: 64px;
+
+@mixin card-box($bgc: $card-bg) {
+    background-color: $bgc;
+    border-radius: $radius;
+    box-shadow: 0 6px 18px rgba(13, 37, 85, 0.06);
+    padding: 1rem;
+}
+
+body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg, $bg 0%, color.adjust($bg, $lightness: -3%));
+    color: #222;
+    margin: 0;
+}
+
+.navbar {
+    box-shadow: 0 6px 18px rgba(13, 37, 85, 0.08);
+    .navbar-brand { font-weight: 700; letter-spacing: 0.2px; }
+}
+
+.card { margin-bottom: 1rem; border: none; .card-body { padding: 0.75rem; } }
+
+.table {
+    td, th { vertical-align: middle; }
+    thead th { font-weight: 600; font-size: 0.95rem; border-bottom: none; padding: 0.9rem; }
+    tbody tr { transition: background .15s ease; }
+    tbody tr:hover { background: color.adjust(#fff, $lightness: -1%); }
+    td { padding: 0.75rem; }
+}
+
+/* Avatars: fixed square, cropped via object-fit */
+.avatar {
+    width: $avatar-size;
+    height: $avatar-size;
+    border-radius: 8px; /* square with rounded corners */
+    object-fit: cover;  /* crop to fit square */
+    display: inline-block;
+    border: 2px solid rgba(13,110,253, 0.06);
+    background: #e9eef8;
+}
+
+/* Larger avatar variant for news cards */
+.avatar-lg {
+    width: $avatar-lg-size !important;
+    height: $avatar-lg-size !important;
+    border-radius: 8px;
+}
+
+/* Ensure avatar-holder doesn't stretch */
+.avatar-holder { width: $avatar-lg-size; height: $avatar-lg-size; overflow: hidden; display: inline-block; }
+
+/* Buttons */
+.btn-primary { background-color: $primary; border-color: $primary;
+    &:hover { background-color: color.adjust($primary, $lightness: -6%); } }
+.btn-success { background-color: #198754; border-color: #198754; }
+
+.container { max-width: 1100px; }
+
+.modal-content { border-radius: 12px; overflow: hidden; }

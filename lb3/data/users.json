@@ -1,0 +1,53 @@
+[
+  {
+    "id": "u1",
+    "firstName": "Иван",
+    "lastName": "Иванов",
+    "birthDate": "1990-05-21",
+    "email": "ivan@example.com",
+    "photo": "/static/uploads/user1.jpg",
+    "role": "user",
+    "status": "active",
+    "friends": [
+      "u2",
+      "u3"
+    ]
+  },
+  {
+    "id": "u2",
+    "firstName": "Мария",
+    "lastName": "Петрова",
+    "birthDate": "1992-08-11",
+    "email": "maria@example.com",
+    "photo": "/static/uploads/user2.jpg",
+    "role": "admin",
+    "status": "active",
+    "friends": [
+      "u1"
+    ]
+  },
+  {
+    "id": "u3",
+    "firstName": "Сергей123",
+    "lastName": "Сидоров123",
+    "birthDate": "1988-02-02",
+    "email": "ser123gey@example.com",
+    "photo": "/static/uploads/user3.jpg",
+    "role": "user",
+    "status": "unverified",
+    "friends": [
+      "u1"
+    ]
+  },
+  {
+    "id": "uDKyHxi",
+    "firstName": "фыв",
+    "lastName": "фыв",
+    "birthDate": "1999-02-12",
+    "email": "x@s.com",
+    "photo": "/static/img/default.png",
+    "role": "user",
+    "status": "unverified",
+    "friends": []
+  }
+]
