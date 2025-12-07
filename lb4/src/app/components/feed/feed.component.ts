@@ -8,11 +8,10 @@ import { AuthService } from '../../services/auth.service';
 import { WebsocketService } from '../../services/websocket.service';
 
 @Component({
-  selector: 'app-feed',
-  standalone: true,
-  imports: [CommonModule, RouterModule],
-  templateUrl: './feed.component.html',
-  styleUrl: './feed.component.scss'
+    selector: 'app-feed',
+    imports: [CommonModule, RouterModule],
+    templateUrl: './feed.component.html',
+    styleUrl: './feed.component.scss'
 })
 export class FeedComponent implements OnInit, OnDestroy {
   // Используем signals для реактивности

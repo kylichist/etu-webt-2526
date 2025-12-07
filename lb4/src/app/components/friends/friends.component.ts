@@ -6,11 +6,10 @@ import { ApiService, User } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
-  selector: 'app-friends',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './friends.component.html',
-  styleUrl: './friends.component.scss'
+    selector: 'app-friends',
+    imports: [CommonModule],
+    templateUrl: './friends.component.html',
+    styleUrl: './friends.component.scss'
 })
 export class FriendsComponent implements OnInit {
   currentUser = signal<User | null>(null);

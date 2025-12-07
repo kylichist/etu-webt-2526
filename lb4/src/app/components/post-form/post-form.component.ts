@@ -7,11 +7,10 @@ import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
-  selector: 'app-post-form',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './post-form.component.html',
-  styleUrl: './post-form.component.scss'
+    selector: 'app-post-form',
+    imports: [CommonModule, ReactiveFormsModule],
+    templateUrl: './post-form.component.html',
+    styleUrl: './post-form.component.scss'
 })
 export class PostFormComponent {
   postForm!: FormGroup;
