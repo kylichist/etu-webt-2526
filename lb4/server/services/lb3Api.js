@@ -2,13 +2,14 @@
 const axios = require('axios');
 
 const LB3_BASE_URL = process.env.LB3_API_URL || 'http://localhost:3000';
+const API_TIMEOUT = parseInt(process.env.API_TIMEOUT || '10000', 10);
 
 class Lb3ApiService {
   constructor() {
     this.baseURL = LB3_BASE_URL;
     this.client = axios.create({
       baseURL: this.baseURL,
-      timeout: 10000
+      timeout: API_TIMEOUT
     });
   }
 

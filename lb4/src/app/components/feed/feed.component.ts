@@ -27,7 +27,7 @@ export class FeedComponent implements OnInit, OnDestroy {
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
-    private websocketService: WebsocketService,
+    public websocketService: WebsocketService,
     private router: Router
   ) {
     // Инициализируем звук для уведомлений
@@ -125,10 +125,16 @@ export class FeedComponent implements OnInit, OnDestroy {
     // Собираем уникальные ID авторов
     const authorIds = [...new Set(posts.map(p => p.authorId))];
     
-    // Загружаем информацию о каждом авторе
-    const userRequests = authorIds.map(id => this.apiService.getUser(id));
+    if (authorIds.length === 0) {
+      this.loading.set(false);
+      return;
+    }
     
-    // Используем простой подход - загружаем по одному
+    // Загружаем информацию о всех авторах параллельно
+    // Используем счетчик для отслеживания завершения всех запросов
+    let completed = 0;
+    const total = authorIds.length;
+    
     authorIds.forEach(id => {
       this.apiService.getUser(id).subscribe({
         next: (user) => {
@@ -137,14 +143,20 @@ export class FeedComponent implements OnInit, OnDestroy {
             newMap.set(id, user);
             return newMap;
           });
+          completed++;
+          if (completed === total) {
+            this.loading.set(false);
+          }
         },
         error: (err) => {
           console.error(`Ошибка загрузки пользователя ${id}:`, err);
+          completed++;
+          if (completed === total) {
+            this.loading.set(false);
+          }
         }
       });
     });
-
-    this.loading.set(false);
   }
 
   private playNotificationSound(): void {
@@ -196,10 +208,5 @@ export class FeedComponent implements OnInit, OnDestroy {
   // Проверка, является ли пользователь админом
   get isAdmin() {
     return this.authService.isAdmin();
-  }
-
-  // Доступ к websocketService для шаблона
-  get websocketService() {
-    return this.websocketService;
   }
 }

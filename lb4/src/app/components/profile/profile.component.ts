@@ -6,6 +6,10 @@ import { Router } from '@angular/router';
 import { ApiService, User } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 
+// Константы для валидации файлов
+const MAX_FILE_SIZE_MB = 5;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
 @Component({
   selector: 'app-profile',
   standalone: true,
@@ -14,7 +18,7 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './profile.component.scss'
 })
 export class ProfileComponent implements OnInit {
-  profileForm: FormGroup;
+  profileForm!: FormGroup;
   currentUser = signal<User | null>(null);
   editMode = signal<boolean>(false);
   error = signal<string>('');
@@ -22,6 +26,7 @@ export class ProfileComponent implements OnInit {
   uploading = signal<boolean>(false);
   selectedFile: File | null = null;
   previewUrl: string | null = null;
+  readonly maxFileSizeMB = MAX_FILE_SIZE_MB;
 
   constructor(
     private fb: FormBuilder,
@@ -143,9 +148,9 @@ export class ProfileComponent implements OnInit {
         return;
       }
 
-      // Проверяем размер (максимум 5MB)
-      if (this.selectedFile.size > 5 * 1024 * 1024) {
-        this.error.set('Размер файла не должен превышать 5MB');
+      // Проверяем размер
+      if (this.selectedFile.size > MAX_FILE_SIZE_BYTES) {
+        this.error.set(`Размер файла не должен превышать ${MAX_FILE_SIZE_MB}MB`);
         this.selectedFile = null;
         return;
       }
