@@ -14,7 +14,7 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './post-form.component.scss'
 })
 export class PostFormComponent {
-  postForm: FormGroup;
+  postForm!: FormGroup;
   error: string = '';
   success: boolean = false;
   submitting: boolean = false;
