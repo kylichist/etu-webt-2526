@@ -1,0 +1,83 @@
+<!-- Форма создания нового поста -->
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-body">
+          <h2 class="card-title mb-4">Создать новость</h2>
+          
+          <!-- Информация о текущем пользователе -->
+          <div *ngIf="currentUser" class="d-flex align-items-center mb-4 pb-3 border-bottom">
+            <img 
+              [src]="currentUser.photo" 
+              alt="Фото профиля"
+              class="rounded-circle me-3"
+              style="width: 48px; height: 48px; object-fit: cover;">
+            <div>
+              <h6 class="mb-0">{{ currentUser.firstName }} {{ currentUser.lastName }}</h6>
+              <small class="text-muted">{{ currentUser.email }}</small>
+            </div>
+          </div>
+
+          <!-- Сообщение об успехе -->
+          <div *ngIf="success" class="alert alert-success" role="alert">
+            <i class="bi bi-check-circle"></i> Пост успешно создан! Перенаправление...
+          </div>
+
+          <!-- Сообщение об ошибке -->
+          <div *ngIf="error" class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> {{ error }}
+          </div>
+
+          <form [formGroup]="postForm" (ngSubmit)="onSubmit()">
+            <!-- Текст поста -->
+            <div class="mb-3">
+              <label for="text" class="form-label">Что у вас нового?</label>
+              <textarea 
+                class="form-control" 
+                id="text"
+                formControlName="text"
+                rows="6"
+                [class.is-invalid]="text?.invalid && text?.touched"
+                placeholder="Напишите что-нибудь интересное..."></textarea>
+              <div class="d-flex justify-content-between mt-2">
+                <div *ngIf="text?.invalid && text?.touched" class="text-danger small">
+                  <div *ngIf="text?.errors?.['required']">Текст поста обязателен</div>
+                  <div *ngIf="text?.errors?.['minlength']">Минимум 1 символ</div>
+                  <div *ngIf="text?.errors?.['maxlength']">Максимум 5000 символов</div>
+                </div>
+                <div class="ms-auto text-muted small">
+                  {{ getCharCount() }} / 5000
+                </div>
+              </div>
+            </div>
+
+            <!-- Кнопки -->
+            <div class="d-flex justify-content-end gap-2 mt-4">
+              <button 
+                type="button" 
+                class="btn btn-outline-secondary"
+                (click)="cancel()"
+                [disabled]="submitting">
+                Отмена
+              </button>
+              <button 
+                type="submit" 
+                class="btn btn-primary"
+                [disabled]="postForm.invalid || submitting || success">
+                <span *ngIf="submitting" class="spinner-border spinner-border-sm me-2"></span>
+                {{ submitting ? 'Публикация...' : 'Опубликовать' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Подсказка -->
+      <div class="alert alert-info mt-3">
+        <i class="bi bi-info-circle"></i> 
+        После публикации ваш пост увидят все ваши друзья в режиме реального времени!
+      </div>
+    </div>
+  </div>
+</div>
