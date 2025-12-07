@@ -1,0 +1,53 @@
+# Docker Compose для lb3 (админ-панель) и lb4 (пользовательское приложение)
+version: '3.8'
+
+services:
+  # Админ-панель lb3
+  lb3-admin:
+    build: ./lb3
+    container_name: lb3-admin
+    ports:
+      - "3000:3000"
+    volumes:
+      - shared-data:/app/data
+      - ./lb3/public:/app/public
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOST=0.0.0.0
+    networks:
+      - social-network
+    restart: unless-stopped
+
+  # Пользовательское приложение lb4
+  lb4-user:
+    build: ./lb4
+    container_name: lb4-user
+    ports:
+      - "4200:4200"  # Angular статические файлы (если нужно отдельно)
+      - "3001:3001"  # Backend API + WebSocket
+    volumes:
+      - shared-data:/app/data:ro  # Read-only доступ к данным lb3
+      - lb4-uploads:/app/uploads  # Отдельное хранилище для загруженных файлов
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - HOST=0.0.0.0
+      - LB3_API_URL=http://lb3-admin:3000
+    depends_on:
+      - lb3-admin
+    networks:
+      - social-network
+    restart: unless-stopped
+
+# Volumes для shared data
+volumes:
+  shared-data:
+    driver: local
+  lb4-uploads:
+    driver: local
+
+# Сеть для коммуникации между контейнерами
+networks:
+  social-network:
+    driver: bridge

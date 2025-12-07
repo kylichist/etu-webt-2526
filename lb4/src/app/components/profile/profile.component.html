@@ -1,0 +1,201 @@
+<!-- Профиль пользователя с управлением фото -->
+<div class="container mt-4">
+  <div class="row">
+    <!-- Левая колонка - Фото профиля -->
+    <div class="col-md-4">
+      <div class="card shadow">
+        <div class="card-body text-center">
+          <h5 class="card-title mb-4">Фото профиля</h5>
+          
+          <!-- Текущее фото -->
+          <div class="mb-3">
+            <img 
+              [src]="previewUrl || currentUser()?.photo || '/static/img/default.jpg'" 
+              alt="Фото профиля"
+              class="rounded-circle img-fluid"
+              style="width: 200px; height: 200px; object-fit: cover; border: 4px solid #f0f0f0;">
+          </div>
+
+          <!-- Выбор файла -->
+          <div *ngIf="!selectedFile" class="mb-3">
+            <label for="photoInput" class="btn btn-outline-primary">
+              <i class="bi bi-camera"></i> Выбрать фото
+            </label>
+            <input 
+              type="file" 
+              id="photoInput" 
+              class="d-none"
+              accept="image/*"
+              (change)="onFileSelected($event)">
+          </div>
+
+          <!-- Предпросмотр и кнопки -->
+          <div *ngIf="selectedFile" class="mb-3">
+            <p class="text-muted small mb-2">{{ selectedFile.name }}</p>
+            <div class="btn-group w-100">
+              <button 
+                class="btn btn-success"
+                (click)="uploadPhoto()"
+                [disabled]="uploading()">
+                <span *ngIf="uploading()" class="spinner-border spinner-border-sm me-1"></span>
+                {{ uploading() ? 'Загрузка...' : 'Загрузить' }}
+              </button>
+              <button 
+                class="btn btn-outline-secondary"
+                (click)="cancelPhotoSelection()"
+                [disabled]="uploading()">
+                Отмена
+              </button>
+            </div>
+          </div>
+
+          <small class="text-muted d-block">
+            Максимальный размер: {{ maxFileSizeMB }}MB<br>
+            Форматы: JPEG, PNG, GIF, WebP
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Правая колонка - Информация профиля -->
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="card-title mb-0">Информация профиля</h5>
+            <button 
+              class="btn btn-sm"
+              [class.btn-outline-primary]="!editMode()"
+              [class.btn-outline-secondary]="editMode()"
+              (click)="toggleEditMode()">
+              <i [class.bi-pencil]="!editMode()" [class.bi-x]="editMode()"></i>
+              {{ editMode() ? 'Отмена' : 'Редактировать' }}
+            </button>
+          </div>
+
+          <!-- Сообщения -->
+          <div *ngIf="success()" class="alert alert-success" role="alert">
+            <i class="bi bi-check-circle"></i> {{ success() }}
+          </div>
+          <div *ngIf="error()" class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> {{ error() }}
+          </div>
+
+          <!-- Форма профиля -->
+          <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+            <!-- Имя -->
+            <div class="mb-3">
+              <label for="firstName" class="form-label">Имя</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="firstName"
+                formControlName="firstName"
+                [class.is-invalid]="firstName?.invalid && firstName?.touched && editMode()">
+              <div *ngIf="firstName?.invalid && firstName?.touched && editMode()" class="invalid-feedback">
+                <div *ngIf="firstName?.errors?.['required']">Имя обязательно</div>
+                <div *ngIf="firstName?.errors?.['minlength']">Минимум 2 символа</div>
+                <div *ngIf="firstName?.errors?.['pattern']">Только буквы, пробелы, дефисы</div>
+              </div>
+            </div>
+
+            <!-- Фамилия -->
+            <div class="mb-3">
+              <label for="lastName" class="form-label">Фамилия</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="lastName"
+                formControlName="lastName"
+                [class.is-invalid]="lastName?.invalid && lastName?.touched && editMode()">
+              <div *ngIf="lastName?.invalid && lastName?.touched && editMode()" class="invalid-feedback">
+                <div *ngIf="lastName?.errors?.['required']">Фамилия обязательна</div>
+                <div *ngIf="lastName?.errors?.['minlength']">Минимум 2 символа</div>
+                <div *ngIf="lastName?.errors?.['pattern']">Только буквы, пробелы, дефисы</div>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input 
+                type="email" 
+                class="form-control" 
+                id="email"
+                formControlName="email"
+                [class.is-invalid]="email?.invalid && email?.touched && editMode()">
+              <div *ngIf="email?.invalid && email?.touched && editMode()" class="invalid-feedback">
+                <div *ngIf="email?.errors?.['required']">Email обязателен</div>
+                <div *ngIf="email?.errors?.['email']">Некорректный формат email</div>
+              </div>
+            </div>
+
+            <!-- Дата рождения -->
+            <div class="mb-3">
+              <label for="birthDate" class="form-label">Дата рождения</label>
+              <input 
+                type="date" 
+                class="form-control" 
+                id="birthDate"
+                formControlName="birthDate"
+                [max]="getCurrentDate()"
+                [class.is-invalid]="birthDate?.invalid && birthDate?.touched && editMode()">
+              <div *ngIf="birthDate?.invalid && birthDate?.touched && editMode()" class="invalid-feedback">
+                <div *ngIf="birthDate?.errors?.['required']">Дата рождения обязательна</div>
+                <div *ngIf="birthDate?.errors?.['pattern']">Формат: YYYY-MM-DD</div>
+              </div>
+            </div>
+
+            <!-- Дополнительная информация (read-only) -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label text-muted">Роль</label>
+                <p class="form-control-plaintext">
+                  <span class="badge" 
+                        [class.bg-danger]="currentUser()?.role === 'admin'"
+                        [class.bg-secondary]="currentUser()?.role === 'user'">
+                    {{ currentUser()?.role === 'admin' ? 'Администратор' : 'Пользователь' }}
+                  </span>
+                </p>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label text-muted">Статус</label>
+                <p class="form-control-plaintext">
+                  <span class="badge"
+                        [class.bg-success]="currentUser()?.status === 'active'"
+                        [class.bg-warning]="currentUser()?.status === 'unverified'"
+                        [class.bg-danger]="currentUser()?.status === 'blocked'">
+                    {{ currentUser()?.status === 'active' ? 'Активен' : 
+                       currentUser()?.status === 'unverified' ? 'Не подтвержден' : 'Заблокирован' }}
+                  </span>
+                </p>
+              </div>
+            </div>
+
+            <!-- Кнопка сохранения -->
+            <div *ngIf="editMode()" class="d-grid mt-4">
+              <button 
+                type="submit" 
+                class="btn btn-primary"
+                [disabled]="profileForm.invalid">
+                <i class="bi bi-check-circle"></i> Сохранить изменения
+              </button>
+            </div>
+          </form>
+
+          <!-- Навигация -->
+          <div class="mt-4 pt-3 border-top">
+            <div class="d-flex gap-2">
+              <a routerLink="/feed" class="btn btn-outline-secondary">
+                <i class="bi bi-house"></i> Лента
+              </a>
+              <a routerLink="/friends" class="btn btn-outline-secondary">
+                <i class="bi bi-people"></i> Друзья
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

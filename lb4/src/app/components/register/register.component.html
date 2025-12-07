@@ -1,0 +1,106 @@
+<!-- Форма регистрации нового пользователя -->
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow">
+        <div class="card-body">
+          <h2 class="card-title text-center mb-4">Регистрация</h2>
+          
+          <!-- Сообщение об успехе -->
+          <div *ngIf="success" class="alert alert-success" role="alert">
+            Регистрация успешна! Перенаправление...
+          </div>
+
+          <!-- Сообщение об ошибке -->
+          <div *ngIf="error" class="alert alert-danger" role="alert">
+            {{ error }}
+          </div>
+
+          <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+            <!-- Имя -->
+            <div class="mb-3">
+              <label for="firstName" class="form-label">Имя *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="firstName"
+                formControlName="firstName"
+                [class.is-invalid]="firstName?.invalid && firstName?.touched"
+                placeholder="Иван">
+              <div *ngIf="firstName?.invalid && firstName?.touched" class="invalid-feedback">
+                <div *ngIf="firstName?.errors?.['required']">Имя обязательно</div>
+                <div *ngIf="firstName?.errors?.['minlength']">Минимум 2 символа</div>
+                <div *ngIf="firstName?.errors?.['pattern']">Только буквы, пробелы, дефисы</div>
+              </div>
+            </div>
+
+            <!-- Фамилия -->
+            <div class="mb-3">
+              <label for="lastName" class="form-label">Фамилия *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="lastName"
+                formControlName="lastName"
+                [class.is-invalid]="lastName?.invalid && lastName?.touched"
+                placeholder="Иванов">
+              <div *ngIf="lastName?.invalid && lastName?.touched" class="invalid-feedback">
+                <div *ngIf="lastName?.errors?.['required']">Фамилия обязательна</div>
+                <div *ngIf="lastName?.errors?.['minlength']">Минимум 2 символа</div>
+                <div *ngIf="lastName?.errors?.['pattern']">Только буквы, пробелы, дефисы</div>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+              <label for="email" class="form-label">Email *</label>
+              <input 
+                type="email" 
+                class="form-control" 
+                id="email"
+                formControlName="email"
+                [class.is-invalid]="email?.invalid && email?.touched"
+                placeholder="ivan@example.com">
+              <div *ngIf="email?.invalid && email?.touched" class="invalid-feedback">
+                <div *ngIf="email?.errors?.['required']">Email обязателен</div>
+                <div *ngIf="email?.errors?.['email'] || email?.errors?.['pattern']">Некорректный формат email</div>
+              </div>
+            </div>
+
+            <!-- Дата рождения -->
+            <div class="mb-3">
+              <label for="birthDate" class="form-label">Дата рождения *</label>
+              <input 
+                type="date" 
+                class="form-control" 
+                id="birthDate"
+                formControlName="birthDate"
+                [class.is-invalid]="birthDate?.invalid && birthDate?.touched"
+                max="{{ getCurrentDate() }}">
+              <div *ngIf="birthDate?.invalid && birthDate?.touched" class="invalid-feedback">
+                <div *ngIf="birthDate?.errors?.['required']">Дата рождения обязательна</div>
+                <div *ngIf="birthDate?.errors?.['pattern']">Формат: YYYY-MM-DD</div>
+              </div>
+              <small class="form-text text-muted">Год: 1900 - {{ getCurrentYear() }}</small>
+            </div>
+
+            <!-- Кнопка отправки -->
+            <div class="d-grid gap-2 mt-4">
+              <button 
+                type="submit" 
+                class="btn btn-primary btn-lg"
+                [disabled]="registerForm.invalid || success">
+                Зарегистрироваться
+              </button>
+            </div>
+
+            <!-- Ссылка на вход -->
+            <div class="text-center mt-3">
+              <small>Уже есть аккаунт? <a routerLink="/feed">Войти</a></small>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
