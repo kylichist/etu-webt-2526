@@ -4,9 +4,9 @@
     "title": "Война и мир",
     "author": "Лев Толстой",
     "year": "1869",
-    "available": true,
-    "holder": null,
-    "dueDate": null,
+    "available": false,
+    "holder": "jjj",
+    "dueDate": "1000-01-01",
     "cover": null
   },
   {

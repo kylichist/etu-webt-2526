@@ -46,6 +46,11 @@ document.addEventListener('DOMContentLoaded', function(){
         listEl.innerHTML = rows.join('');
     }
 
+    const availableEl = document.getElementById('available');
+    const dueBeforeEl = document.getElementById('dueBefore');
+    if (availableEl) availableEl.addEventListener('change', loadBooks);
+    if (dueBeforeEl) dueBeforeEl.addEventListener('change', loadBooks);
+
     applyBtn.addEventListener('click', (e) => { e.preventDefault(); loadBooks(); });
     resetBtn.addEventListener('click', (e) => {
         e.preventDefault();

@@ -25,7 +25,8 @@ let dropInterval = 500;
 draw();
 
 function createPiece() {
-    return {shape: TETROMINOS[Math.floor(Math.random() * TETROMINOS.length)].map(r => r.slice()), x: 3, y: 0};
+    const shape =  TETROMINOS[Math.floor(Math.random() * TETROMINOS.length)].map(r => r.slice());
+    return {shape: shape, x: Math.floor(Math.random() * (Math.max(0, COLS - shape[0].length) + 1)), y: 0};
 }
 
 function startGame() {
