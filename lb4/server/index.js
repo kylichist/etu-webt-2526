@@ -38,6 +38,15 @@ app.use((req, res, next) => {
 app.use('/api', apiRoutes);
 app.use('/api/upload', uploadRoutes);
 
+// Serve Angular app в production
+const distPath = path.join(__dirname, '../dist');
+if (require('fs').existsSync(distPath)) {
+  app.use(express.static(distPath));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+}
+
 // WebSocket подключение
 io.on('connection', (socket) => {
   console.log('Клиент подключился к WebSocket:', socket.id);

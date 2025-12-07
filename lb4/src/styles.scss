@@ -1,1 +1,69 @@
-/* You can add global styles to this file, and also import other style files */
+/* Глобальные стили для приложения социальной сети */
+
+/* Bootstrap CSS */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+/* Общие стили */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f5f5f5;
+}
+
+/* Анимации для постов */
+.post-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.post-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Стили для текста постов */
+.post-text {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Улучшенные кнопки */
+.btn {
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+/* Toast нотификации */
+.toast {
+  background-color: white;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Карточки */
+.card {
+  transition: box-shadow 0.2s ease;
+}
+
+/* Стили загрузки */
+.spinner-border {
+  animation: spinner-border 0.75s linear infinite;
+}
+
+@keyframes spinner-border {
+  to { transform: rotate(360deg); }
+}
