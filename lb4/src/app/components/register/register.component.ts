@@ -7,11 +7,10 @@ import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
-  selector: 'app-register',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './register.component.html',
-  styleUrl: './register.component.scss'
+    selector: 'app-register',
+    imports: [CommonModule, ReactiveFormsModule],
+    templateUrl: './register.component.html',
+    styleUrl: './register.component.scss'
 })
 export class RegisterComponent {
   registerForm: FormGroup;
