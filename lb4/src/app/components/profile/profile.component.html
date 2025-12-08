@@ -10,7 +10,7 @@
           <!-- Текущее фото -->
           <div class="mb-3">
             <img 
-              [src]="previewUrl || currentUser()?.photo || '/static/img/default.jpg'" 
+              [src]="previewUrl || getPhotoUrl(currentUser()?.photo)" 
               alt="Фото профиля"
               class="rounded-circle img-fluid"
               style="width: 200px; height: 200px; object-fit: cover; border: 4px solid #f0f0f0;">

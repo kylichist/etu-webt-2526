@@ -78,18 +78,8 @@ export class FeedComponent implements OnInit, OnDestroy {
   }
 
   private showLoginPrompt(): void {
-    // Загружаем список пользователей для выбора
-    this.apiService.getUsers().subscribe({
-      next: (users) => {
-        // Пока что просто перенаправляем на регистрацию
-        // В реальном приложении здесь был бы modal с выбором пользователя
-        this.router.navigate(['/register']);
-      },
-      error: (err) => {
-        console.error('Ошибка загрузки пользователей:', err);
-        this.router.navigate(['/register']);
-      }
-    });
+    // Перенаправляем на страницу входа
+    this.router.navigate(['/login']);
   }
 
   private loadData(): void {
@@ -171,6 +161,11 @@ export class FeedComponent implements OnInit, OnDestroy {
   // Получить автора поста
   getAuthor(authorId: string): User | undefined {
     return this.users().get(authorId);
+  }
+
+  // Получить URL фото
+  getPhotoUrl(photo: string | undefined): string {
+    return this.apiService.getPhotoUrl(photo);
   }
 
   // Форматирование даты

@@ -39,11 +39,12 @@ app.use('/api', apiRoutes);
 app.use('/api/upload', uploadRoutes);
 
 // Serve Angular app в production
-const distPath = path.join(__dirname, '../dist');
+const distPath = path.join(__dirname, '../dist/social-app/browser');
 if (require('fs').existsSync(distPath)) {
   app.use(express.static(distPath));
-  app.get('/{*path}', (req, res) => {
-    res.sendFile(path.join(__dirname, '../dist/browser/index.html'));
+  // В Express 5 используем правильный синтаксис для catch-all маршрута
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(distPath, 'index.html'));
   });
 }
 

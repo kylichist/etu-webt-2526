@@ -95,7 +95,7 @@ export class ApiService {
 
   getPhotoUrl(photo: string | undefined): string {
     if (!photo) {
-      return 'http://localhost:3000/static/img/default.png';
+      return '/static/img/default.png';
     }
 
     // Если путь уже полный URL
@@ -104,16 +104,16 @@ export class ApiService {
     }
 
     // Если фото загружено через lb4 (/uploads/...)
-    if (photo. startsWith('/uploads/')) {
-      return `http://localhost:3001${photo}`;
+    if (photo.startsWith('/uploads/')) {
+      return photo; // Проксируется через lb4 server
     }
 
     // Если фото из lb3 (/static/...)
     if (photo.startsWith('/static/')) {
-      return `http://localhost:3000${photo}`;
+      return photo; // Проксируется через proxy.conf.json
     }
 
     // Fallback
-    return `http://localhost:3000/static/img/default.png`;
+    return '/static/img/default.png';
   }
 }
