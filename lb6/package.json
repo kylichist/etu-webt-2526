@@ -3,10 +3,5 @@
     "scripts": {
         "build": "cd server && npm run build && cd ../client && npm run build",
         "start": "node server/dist/main.js",
-        "test:e2e": "cd e2e && npx playwright install && npx playwright test",
-        "fulltest": "npm run build && npm run start & npm run test:e2e"
-    },
-    "dependencies": {
-        "@playwright/test": "^1.57.0"
     }
 }

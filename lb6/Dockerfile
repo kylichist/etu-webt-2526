@@ -25,11 +25,6 @@ RUN npm run build
 # Final
 WORKDIR /app
 
-COPY e2e/ e2e/
-COPY package*.json ./
-
-RUN npm ci
-
 EXPOSE 8000
 
 CMD ["node", "server/dist/main.js"]

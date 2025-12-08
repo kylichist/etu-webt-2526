@@ -1,16 +1,18 @@
 import { NestFactory } from '@nestjs/core';
-import { NestExpressApplication } from '@nestjs/platform-express';  // Добавить
-import { join } from 'path';  // Добавить
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-    const app = await NestFactory.create<NestExpressApplication>(AppModule);  // Изменить тип
+    const app = await NestFactory.create<NestExpressApplication>(AppModule);
     app.useGlobalPipes(new ValidationPipe());
     app.enableCors();
 
-    app.useStaticAssets(join(__dirname, '..', '..', 'client', 'dist'));
-    app.setBaseViewsDir(join(__dirname, '..', '..', 'client', 'dist'));
+    const clientDist = join(__dirname, '..', '..', 'client', 'dist');
+    console.log(clientDist)
+    app.useStaticAssets(clientDist);
+    app.setBaseViewsDir(clientDist);
     app.setViewEngine('html');
 
     await app.listen(8000);
