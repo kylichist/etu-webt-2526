@@ -45,7 +45,7 @@
     "lastName": "фыв",
     "birthDate": "1999-02-12",
     "email": "x@s.com",
-    "photo": "/static/img/default.png",
+    "photo": "/static/img/default.jpg",
     "role": "user",
     "status": "unverified",
     "friends": []

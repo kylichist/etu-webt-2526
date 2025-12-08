@@ -21,7 +21,7 @@ WORKDIR /app
 
 # Копируем package files и устанавливаем только production зависимости
 COPY package.json package-lock.json* ./
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 # Копируем серверный код
 COPY server ./server

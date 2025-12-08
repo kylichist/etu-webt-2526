@@ -26,9 +26,13 @@ export interface Post {
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = '/api'; // Проксируется к backend серверу
+  private apiUrl = '/api';
 
-  constructor(private http: HttpClient) { }
+  // ХАРДКОД URL для картинок — радикальное решение
+  private lb3Url = 'http://localhost:3000';
+  private lb4Url = 'http://localhost:3001';
+
+  constructor(private http: HttpClient) {}
 
   // ============ Пользователи ============
 
@@ -45,7 +49,7 @@ export class ApiService {
   }
 
   updateUser(id: string, userData: Partial<User>): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/users/${id}`, userData);
+    return this.http. put<User>(`${this. apiUrl}/users/${id}`, userData);
   }
 
   deleteUser(id: string): Observable<any> {
@@ -53,7 +57,7 @@ export class ApiService {
   }
 
   getUserFriends(id: string): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiUrl}/users/${id}/friends`);
+    return this.http. get<User[]>(`${this.apiUrl}/users/${id}/friends`);
   }
 
   getUserNews(id: string): Observable<Post[]> {
@@ -94,26 +98,26 @@ export class ApiService {
   }
 
   getPhotoUrl(photo: string | undefined): string {
-    if (!photo) {
-      return '/static/img/default.png';
+    if (! photo) {
+      return `${this. lb3Url}/static/img/default. jpg`;
     }
 
-    // Если путь уже полный URL
     if (photo.startsWith('http')) {
       return photo;
     }
 
-    // Если фото загружено через lb4 (/uploads/...)
-    if (photo.startsWith('/uploads/')) {
-      return photo; // Проксируется через lb4 server
-    }
-
-    // Если фото из lb3 (/static/...)
     if (photo.startsWith('/static/')) {
-      return photo; // Проксируется через proxy.conf.json
+      return `${this.lb3Url}${photo}`;
     }
 
-    // Fallback
-    return '/static/img/default.png';
+    if (photo.startsWith('/uploads/')) {
+      return `${this.lb4Url}${photo}`;
+    }
+
+    if (! photo.startsWith('/')) {
+      return `${this.lb4Url}/uploads/${photo}`;
+    }
+
+    return `${this. lb3Url}/static/img/default.jpg`;
   }
 }

@@ -6,15 +6,26 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import bodyParser from 'body-parser';
 import usersRouter from './routes/users.js';
-import postsRouter from './routes/posts.js'; // <- новый роутер
+import postsRouter from './routes/posts.js';
 
 const projectRoot = process.cwd();
 const app = express();
 
 app.use(morgan('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(helmet({ contentSecurityPolicy: false }));
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(helmet({
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: false,
+    crossOriginEmbedderPolicy: false,
+    crossOriginOpenerPolicy: false
+}));
+
+app.use((req, res, next) => {
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    next();
+});
 
 const candidates = [
     path.join(projectRoot, 'build_webpack'),
@@ -22,9 +33,15 @@ const candidates = [
     path.join(projectRoot, 'public')
 ];
 
-function dirExists(p) { try { return fs.existsSync(p) && fs.statSync(p).isDirectory(); } catch (e) { return false; } }
+function dirExists(p) {
+    try {
+        return fs.existsSync(p) && fs.statSync(p).isDirectory();
+    } catch (e) {
+        return false;
+    }
+}
 
-const mounted = { styles: [], js: [], img: [], root: [] };
+const mounted = {styles: [], js: [], img: [], root: []};
 
 for (const cand of candidates) {
     if (!dirExists(cand)) continue;
@@ -32,17 +49,28 @@ for (const cand of candidates) {
     // css dirs
     const cssDirs = [path.join(cand, 'css'), path.join(cand, 'styles')];
     for (const cssDir of cssDirs) {
-        if (dirExists(cssDir)) { app.use('/static/styles', express.static(cssDir)); mounted.styles.push(cssDir); break; }
+        if (dirExists(cssDir)) {
+            app.use('/static/styles', express.static(cssDir));
+            mounted.styles.push(cssDir);
+            break;
+        }
     }
 
     // js dir
     const jsDir = path.join(cand, 'js');
-    if (dirExists(jsDir)) { app.use('/static/js', express.static(jsDir)); mounted.js.push(jsDir); }
+    if (dirExists(jsDir)) {
+        app.use('/static/js', express.static(jsDir));
+        mounted.js.push(jsDir);
+    }
 
     // images
     const imgCandidates = [path.join(cand, 'public', 'img'), path.join(cand, 'img')];
     for (const id of imgCandidates) {
-        if (dirExists(id)) { app.use('/static/img', express.static(id)); mounted.img.push(id); break; }
+        if (dirExists(id)) {
+            app.use('/static/img', express.static(id));
+            mounted.img.push(id);
+            break;
+        }
     }
 
     // fallback root
@@ -62,9 +90,9 @@ app.use('/api/posts', postsRouter); // <- подключаем новый роу
 app.set('views', path.join(projectRoot, 'views'));
 app.set('view engine', 'pug');
 
-app.get('/', (req, res) => res.render('index', { title: 'Admin — Social Network' }));
+app.get('/', (req, res) => res.render('index', {title: 'Admin — Social Network'}));
 app.get('/users', (req, res) => res.render('users'));
-app.get('/friends/:id', (req, res) => res.render('friends', { userId: req.params.id }));
+app.get('/friends/:id', (req, res) => res.render('friends', {userId: req.params.id}));
 app.get('/news', (req, res) => res.render('news'));
 
 const PORT = Number(process.env.PORT || 3000);
