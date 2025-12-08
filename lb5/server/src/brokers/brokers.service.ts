@@ -12,7 +12,9 @@ export interface Broker {
 
 @Injectable()
 export class BrokersService {
-  private readonly dataPath = path.join(process.cwd(), 'data', 'brokers.json');
+  private readonly dataPath = process.env.DATA_PATH 
+    ? path.join(process.env.DATA_PATH, 'brokers.json')
+    : path.join(process.cwd(), '..', 'data', 'brokers.json');
 
   // Получить всех брокеров
   async findAll(): Promise<Broker[]> {

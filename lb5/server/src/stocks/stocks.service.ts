@@ -17,7 +17,9 @@ export interface Stock {
 
 @Injectable()
 export class StocksService {
-  private readonly dataPath = path.join(process.cwd(), 'data', 'stocks.json');
+  private readonly dataPath = process.env.DATA_PATH 
+    ? path.join(process.env.DATA_PATH, 'stocks.json')
+    : path.join(process.cwd(), '..', 'data', 'stocks.json');
 
   // Получить все акции
   async findAll(): Promise<Stock[]> {
