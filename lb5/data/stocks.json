@@ -107,7 +107,7 @@
     "id": "SBUX",
     "symbol": "SBUX",
     "name": "Starbucks, Inc.",
-    "selected": false,
+    "selected": true,
     "historicalData": [
       {
         "date": "2020-01-02",
@@ -627,7 +627,7 @@
     "id": "TSLA",
     "symbol": "TSLA",
     "name": "Tesla, Inc.",
-    "selected": false,
+    "selected": true,
     "historicalData": [
       {
         "date": "2020-01-02",
