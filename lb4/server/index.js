@@ -42,15 +42,15 @@ app.use('/api/upload', uploadRoutes);
 const distPath = path.join(__dirname, '../dist');
 if (require('fs').existsSync(distPath)) {
   app.use(express.static(distPath));
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(distPath, 'index.html'));
+  app.get('/{*path}', (req, res) => {
+    res.sendFile(path.join(__dirname, '../dist/browser/index.html'));
   });
 }
 
 // WebSocket подключение
 io.on('connection', (socket) => {
   console.log('Клиент подключился к WebSocket:', socket.id);
-  
+
   socket.on('disconnect', () => {
     console.log('Клиент отключился:', socket.id);
   });

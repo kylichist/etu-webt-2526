@@ -1,7 +1,3 @@
-# Docker Compose для lb3 (админ-панель) и lb4 (пользовательское приложение)
-# ВАЖНО: Запускать из папки lb4: cd lb4 && docker-compose up
-version: '3.8'
-
 services:
   # Админ-панель lb3
   lb3-admin:
@@ -11,7 +7,7 @@ services:
       - "3000:3000"
     volumes:
       - shared-data:/app/data
-      - ../lb3/public:/app/public
+      - shared-uploads:/app/public/uploads
     environment:
       - NODE_ENV=production
       - PORT=3000
@@ -20,16 +16,15 @@ services:
       - social-network
     restart: unless-stopped
 
-  # Пользовательское приложение lb4
   lb4-user:
     build: .
     container_name: lb4-user
     ports:
-      - "4200:4200"  # Angular статические файлы (если нужно отдельно)
+      - "8888:4200"  # Angular статические файлы (если нужно отдельно)
       - "3001:3001"  # Backend API + WebSocket
     volumes:
       - shared-data:/app/data:ro  # Read-only доступ к данным lb3
-      - lb4-uploads:/app/uploads  # Отдельное хранилище для загруженных файлов
+      - shared-uploads:/app/uploads  # Отдельное хранилище для загруженных файлов
     environment:
       - NODE_ENV=production
       - PORT=3001
@@ -44,9 +39,7 @@ services:
 # Volumes для shared data
 volumes:
   shared-data:
-    driver: local
-  lb4-uploads:
-    driver: local
+  shared-uploads:
 
 # Сеть для коммуникации между контейнерами
 networks:

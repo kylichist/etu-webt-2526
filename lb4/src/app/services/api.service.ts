@@ -31,7 +31,7 @@ export class ApiService {
   constructor(private http: HttpClient) { }
 
   // ============ Пользователи ============
-  
+
   getUsers(): Observable<User[]> {
     return this.http.get<User[]>(`${this.apiUrl}/users`);
   }
@@ -61,7 +61,7 @@ export class ApiService {
   }
 
   // ============ Посты ============
-  
+
   getPosts(authorId?: string): Observable<Post[]> {
     let params = new HttpParams();
     if (authorId) {
@@ -79,7 +79,7 @@ export class ApiService {
   }
 
   // ============ Загрузка файлов ============
-  
+
   uploadPhoto(file: File): Observable<{ success: boolean; url: string; filename: string }> {
     const formData = new FormData();
     formData.append('photo', file);
@@ -91,5 +91,29 @@ export class ApiService {
 
   deletePhoto(filename: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/upload/photo/${filename}`);
+  }
+
+  getPhotoUrl(photo: string | undefined): string {
+    if (!photo) {
+      return 'http://localhost:3000/static/img/default.png';
+    }
+
+    // Если путь уже полный URL
+    if (photo.startsWith('http')) {
+      return photo;
+    }
+
+    // Если фото загружено через lb4 (/uploads/...)
+    if (photo. startsWith('/uploads/')) {
+      return `http://localhost:3001${photo}`;
+    }
+
+    // Если фото из lb3 (/static/...)
+    if (photo.startsWith('/static/')) {
+      return `http://localhost:3000${photo}`;
+    }
+
+    // Fallback
+    return `http://localhost:3000/static/img/default.png`;
   }
 }

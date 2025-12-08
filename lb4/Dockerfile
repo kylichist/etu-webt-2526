@@ -1,5 +1,3 @@
-# Multi-stage Dockerfile для lb4
-
 # Stage 1: Build Angular приложения
 FROM node:22-alpine AS angular-build
 

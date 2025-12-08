@@ -1,12 +1,12 @@
 {
-  "name": "social-app",
-  "version": "0.0.0",
+  "name": "lb4",
+  "version": "1.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
+    "test": "ng test --browsers=ChromeHeadless --watch=false",
     "server": "node server/index.js",
     "server:dev": "nodemon server/index.js",
     "dev": "concurrently \"npm run server:dev\" \"npm start\"",
