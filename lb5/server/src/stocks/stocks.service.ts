@@ -17,9 +17,9 @@ export interface Stock {
 
 @Injectable()
 export class StocksService {
-  private readonly dataPath = process.env.DATA_PATH 
+  private readonly dataPath = process.env.DATA_PATH
     ? path.join(process.env.DATA_PATH, 'stocks.json')
-    : path.join(process.cwd(), '..', 'data', 'stocks.json');
+    : path.join(process.cwd(), 'data', 'stocks.json');
 
   // Получить все акции
   async findAll(): Promise<Stock[]> {
@@ -41,14 +41,14 @@ export class StocksService {
   async updateSelection(id: string, selected: boolean): Promise<Stock | null> {
     const stocks = await this.findAll();
     const stock = stocks.find(s => s.id === id);
-    
+
     if (!stock) {
       return null;
     }
 
     stock.selected = selected;
     await this.saveAll(stocks);
-    
+
     return stock;
   }
 
@@ -62,7 +62,7 @@ export class StocksService {
   getPriceForDate(stock: Stock, date: string): number {
     // Найти ближайшую дату в исторических данных
     const dataPoint = stock.historicalData.find(d => d.date === date);
-    
+
     if (dataPoint) {
       // Удалить $ и , из строки и преобразовать в число
       return parseFloat(dataPoint.open.replace(/[$,]/g, ''));

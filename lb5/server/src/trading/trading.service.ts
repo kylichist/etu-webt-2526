@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { StocksService } from '../stocks/stocks.service';
+import {StocksService} from '../stocks/stocks.service';
 
 export interface TradingSettings {
   startDate: string;
@@ -18,12 +18,13 @@ export interface StockPrice {
 
 @Injectable()
 export class TradingService {
-  private readonly settingsPath = process.env.DATA_PATH 
+  private readonly settingsPath = process.env.DATA_PATH
     ? path.join(process.env.DATA_PATH, 'settings.json')
-    : path.join(process.cwd(), '..', 'data', 'settings.json');
+    : path.join(process.cwd(), 'data', 'settings.json');
   private tradingInterval: NodeJS.Timeout | null = null;
 
-  constructor(private readonly stocksService: StocksService) {}
+  constructor(private readonly stocksService: StocksService) {
+  }
 
   // Получить настройки торгов
   async getSettings(): Promise<TradingSettings> {
@@ -45,7 +46,7 @@ export class TradingService {
   // Обновить настройки торгов
   async updateSettings(settings: Partial<TradingSettings>): Promise<TradingSettings> {
     const currentSettings = await this.getSettings();
-    const newSettings = { ...currentSettings, ...settings };
+    const newSettings = {...currentSettings, ...settings};
     await this.saveSettings(newSettings);
     return newSettings;
   }
@@ -63,7 +64,7 @@ export class TradingService {
     const settings = await this.getSettings();
     settings.isTrading = false;
     await this.saveSettings(settings);
-    
+
     if (this.tradingInterval) {
       clearInterval(this.tradingInterval);
       this.tradingInterval = null;
@@ -74,7 +75,7 @@ export class TradingService {
   async getCurrentPrices(): Promise<StockPrice[]> {
     const settings = await this.getSettings();
     const stocks = await this.stocksService.getSelected();
-    
+
     return stocks.map(stock => ({
       symbol: stock.symbol,
       price: this.stocksService.getPriceForDate(stock, settings.currentDate),
@@ -86,14 +87,14 @@ export class TradingService {
   async advanceDate(): Promise<string> {
     const settings = await this.getSettings();
     const currentDate = new Date(settings.currentDate);
-    
+
     // Двигаемся вперед на 1 месяц
     currentDate.setMonth(currentDate.getMonth() + 1);
-    
+
     const newDate = currentDate.toISOString().split('T')[0];
     settings.currentDate = newDate;
     await this.saveSettings(settings);
-    
+
     return newDate;
   }
 

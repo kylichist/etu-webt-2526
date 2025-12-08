@@ -12,9 +12,9 @@ export interface Broker {
 
 @Injectable()
 export class BrokersService {
-  private readonly dataPath = process.env.DATA_PATH 
+  private readonly dataPath = process.env.DATA_PATH
     ? path.join(process.env.DATA_PATH, 'brokers.json')
-    : path.join(process.cwd(), '..', 'data', 'brokers.json');
+    : path.join(process.cwd(), 'data', 'brokers.json');
 
   // Получить всех брокеров
   async findAll(): Promise<Broker[]> {
@@ -35,10 +35,10 @@ export class BrokersService {
   // Создать нового брокера
   async create(brokerData: { name: string; initialFunds: number }): Promise<Broker> {
     const brokers = await this.findAll();
-    
+
     // Генерация ID
     const id = `broker_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     const newBroker: Broker = {
       id,
       name: brokerData.name,
@@ -49,7 +49,7 @@ export class BrokersService {
 
     brokers.push(newBroker);
     await this.saveAll(brokers);
-    
+
     return newBroker;
   }
 
@@ -57,14 +57,14 @@ export class BrokersService {
   async update(id: string, brokerData: Partial<Broker>): Promise<Broker | null> {
     const brokers = await this.findAll();
     const index = brokers.findIndex(broker => broker.id === id);
-    
+
     if (index === -1) {
       return null;
     }
 
     brokers[index] = { ...brokers[index], ...brokerData };
     await this.saveAll(brokers);
-    
+
     return brokers[index];
   }
 
@@ -72,7 +72,7 @@ export class BrokersService {
   async remove(id: string): Promise<boolean> {
     const brokers = await this.findAll();
     const filteredBrokers = brokers.filter(broker => broker.id !== id);
-    
+
     if (filteredBrokers.length === brokers.length) {
       return false;
     }

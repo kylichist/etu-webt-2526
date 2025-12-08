@@ -5,7 +5,7 @@ class WebSocketService {
 
   connect() {
     if (!this.socket) {
-      this.socket = io('http://localhost:3001', {
+      this.socket = io('/', {
         transports: ['websocket'],
       });
 

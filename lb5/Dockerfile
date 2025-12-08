@@ -21,7 +21,7 @@ WORKDIR /app/client
 COPY client/package*.json ./
 RUN npm ci
 
-COPY client/tsconfig.json client/tsconfig.node.json client/vite.config.ts ./
+COPY client/tsconfig.json client/tsconfig.node.json client/vite.config.ts client/index.html ./
 COPY client/src ./src
 COPY client/public ./public
 
@@ -50,7 +50,7 @@ COPY --from=client-build /app/client/dist ./client/dist
 COPY data ./data
 
 # Expose ports
-EXPOSE 3001 3000
+EXPOSE 3000
 
 # Start server
 CMD ["node", "server/dist/main"]
