@@ -1,0 +1,32 @@
+services:
+  lb5:
+    build: ../lb5
+    ports:
+      - "3000:3000"
+    volumes:
+      - stock-data:/app/data
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "sleep 5 && exit 0" ]
+      interval: 1s
+      timeout: 10s
+      retries: 1
+      start_period: 0s
+
+  lb6:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      lb5:
+        condition: service_healthy
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  stock-data:
