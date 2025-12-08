@@ -5,5 +5,12 @@
     "initialFunds": 100000,
     "currentFunds": 100000,
     "portfolio": {}
+  },
+  {
+    "id": "broker_1765155137335_icr5yjy60",
+    "name": "John Smith",
+    "initialFunds": 250000,
+    "currentFunds": 250000,
+    "portfolio": {}
   }
 ]

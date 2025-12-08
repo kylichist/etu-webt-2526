@@ -1,6 +1,6 @@
 {
   "startDate": "2021-01-01",
   "speedSeconds": 1,
-  "isTrading": false,
-  "currentDate": "2021-01-01"
+  "isTrading": true,
+  "currentDate": "2135-01-01"
 }
