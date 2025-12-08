@@ -1,13 +1,13 @@
 // Компонент управления друзьями
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ApiService, User } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-friends',
-    imports: [CommonModule],
+    imports: [CommonModule, RouterLink],
     templateUrl: './friends.component.html',
     styleUrl: './friends.component.scss'
 })
@@ -26,7 +26,7 @@ export class FriendsComponent implements OnInit {
   ) {
     // Проверяем авторизацию
     if (!this.authService.isAuthenticated()) {
-      this.router.navigate(['/register']);
+      this.router.navigate(['/login']);
       return;
     }
   }
@@ -160,5 +160,10 @@ export class FriendsComponent implements OnInit {
     const user = this.currentUser();
     if (!user) return [];
     return this.allUsers().filter(u => !user.friends.includes(u.id));
+  }
+
+  // Получить URL фото
+  getPhotoUrl(photo: string | undefined): string {
+    return this.apiService.getPhotoUrl(photo);
   }
 }

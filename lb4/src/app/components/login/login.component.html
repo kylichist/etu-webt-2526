@@ -1,0 +1,63 @@
+<!-- Страница выбора пользователя -->
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow">
+        <div class="card-body p-5">
+          <h2 class="text-center mb-4">Войти в социальную сеть</h2>
+          <p class="text-center text-muted mb-4">
+            Выберите пользователя для входа (учебный проект, пароль не требуется)
+          </p>
+
+          <!-- Статус загрузки -->
+          <div *ngIf="loading()" class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Загрузка...</span>
+            </div>
+            <p class="mt-2 text-muted">Загрузка пользователей...</p>
+          </div>
+
+          <!-- Ошибка -->
+          <div *ngIf="error()" class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            {{ error() }}
+          </div>
+
+          <!-- Список пользователей -->
+          <div *ngIf="!loading() && !error()" class="list-group">
+            <button
+              *ngFor="let user of users()"
+              type="button"
+              class="list-group-item list-group-item-action d-flex align-items-center p-3"
+              (click)="selectUser(user)"
+              [class.list-group-item-success]="user.status === 'active'"
+              [class.list-group-item-warning]="user.status === 'unverified'"
+              [class.list-group-item-danger]="user.status === 'blocked'"
+            >
+              <img
+                [src]="getPhotoUrl(user.photo)"
+                alt="Фото пользователя"
+                class="rounded-circle me-3"
+                style="width: 50px; height: 50px; object-fit: cover;"
+              />
+              <div class="flex-grow-1">
+                <h6 class="mb-0">{{ user.firstName }} {{ user.lastName }}</h6>
+                <small class="text-muted">{{ user.email }}</small>
+                <span *ngIf="user.role === 'admin'" class="badge bg-danger ms-2">Администратор</span>
+              </div>
+              <i class="bi bi-chevron-right"></i>
+            </button>
+          </div>
+
+          <!-- Регистрация -->
+          <div class="text-center mt-4">
+            <p class="text-muted mb-2">Нет аккаунта?</p>
+            <a routerLink="/register" class="btn btn-outline-primary">
+              <i class="bi bi-person-plus"></i> Зарегистрироваться
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

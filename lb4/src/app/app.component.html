@@ -1,3 +1,52 @@
 <!-- Главный компонент приложения социальной сети -->
 
+<!-- Навигационное меню (показывается только для авторизованных пользователей) -->
+<nav *ngIf="isAuthenticated()" class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container-fluid">
+    <a class="navbar-brand" routerLink="/feed">
+      <i class="bi bi-chat-dots-fill me-2"></i>Социальная сеть
+    </a>
+    <button 
+      class="navbar-toggler" 
+      type="button" 
+      data-bs-toggle="collapse" 
+      data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/feed" routerLinkActive="active">
+            <i class="bi bi-house-door"></i> Лента
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/friends" routerLinkActive="active">
+            <i class="bi bi-people"></i> Друзья
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/profile" routerLinkActive="active">
+            <i class="bi bi-person"></i> Профиль
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/post/new" routerLinkActive="active">
+            <i class="bi bi-plus-circle"></i> Новый пост
+          </a>
+        </li>
+      </ul>
+      <div class="d-flex align-items-center">
+        <span class="text-white me-3">
+          <i class="bi bi-person-circle me-1"></i>
+          {{ currentUser()?.firstName }} {{ currentUser()?.lastName }}
+        </span>
+        <button class="btn btn-outline-light btn-sm" (click)="logout()">
+          <i class="bi bi-box-arrow-right"></i> Выйти
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
 <router-outlet />

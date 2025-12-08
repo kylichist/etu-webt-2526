@@ -26,7 +26,7 @@ export class PostFormComponent {
   ) {
     // Проверяем авторизацию
     if (!this.authService.isAuthenticated()) {
-      this.router.navigate(['/register']);
+      this.router.navigate(['/login']);
       return;
     }
 

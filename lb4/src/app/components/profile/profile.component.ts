@@ -2,7 +2,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ApiService, User } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 
@@ -12,7 +12,7 @@ const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
 @Component({
     selector: 'app-profile',
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [CommonModule, ReactiveFormsModule, RouterLink],
     templateUrl: './profile.component.html',
     styleUrl: './profile.component.scss'
 })
@@ -35,7 +35,7 @@ export class ProfileComponent implements OnInit {
   ) {
     // Проверяем авторизацию
     if (!this.authService.isAuthenticated()) {
-      this.router.navigate(['/register']);
+      this.router.navigate(['/login']);
       return;
     }
 
@@ -221,5 +221,10 @@ export class ProfileComponent implements OnInit {
 
   getCurrentDate(): string {
     return new Date().toISOString().split('T')[0];
+  }
+
+  // Получить URL фото
+  getPhotoUrl(photo: string | undefined): string {
+    return this.apiService.getPhotoUrl(photo);
   }
 }

@@ -22,7 +22,9 @@ export class WebsocketService {
     }
 
     // Подключаемся к backend серверу на порту 3001
-    this.socket = io('http://localhost:3001', {
+    // Используем window.location.hostname для работы в разных окружениях
+    const wsUrl = `${window.location.protocol}//${window.location.hostname}:3001`;
+    this.socket = io(wsUrl, {
       transports: ['websocket', 'polling']
     });
 
