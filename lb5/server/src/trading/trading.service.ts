@@ -18,7 +18,9 @@ export interface StockPrice {
 
 @Injectable()
 export class TradingService {
-  private readonly settingsPath = path.join(process.cwd(), 'data', 'settings.json');
+  private readonly settingsPath = process.env.DATA_PATH 
+    ? path.join(process.env.DATA_PATH, 'settings.json')
+    : path.join(process.cwd(), '..', 'data', 'settings.json');
   private tradingInterval: NodeJS.Timeout | null = null;
 
   constructor(private readonly stocksService: StocksService) {}

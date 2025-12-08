@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "id": "broker_1765155028021_ayq868lzn",
+    "name": "Test Broker",
+    "initialFunds": 100000,
+    "currentFunds": 100000,
+    "portfolio": {}
+  }
+]
