@@ -51,6 +51,8 @@ function validateUserPayload(payload, forCreate = false) {
             errors.push('birthDate must be in YYYY-MM-DD format.');
         } else if (year < 1900 || year > currentYear) {
             errors.push(`birthDate year must be between 1900 and ${currentYear}.`);
+        } else if (currentYear - year < 18) {
+            errors.push(`User must be at least 18 years old.`);
         }
     }
 

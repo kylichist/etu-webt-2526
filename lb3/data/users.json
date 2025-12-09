@@ -49,5 +49,27 @@
     "role": "user",
     "status": "unverified",
     "friends": []
+  },
+  {
+    "id": "ug2NWln",
+    "firstName": "фыв",
+    "lastName": "фыв",
+    "birthDate": "2005-12-12",
+    "email": "asd@asd.com",
+    "photo": "/static/img/default.jpg",
+    "role": "user",
+    "status": "unverified",
+    "friends": []
+  },
+  {
+    "id": "uDm__Rj",
+    "firstName": "asd",
+    "lastName": "asd",
+    "birthDate": "2000-12-12",
+    "email": "as@asd.com",
+    "photo": "/static/img/default.jpg",
+    "role": "user",
+    "status": "unverified",
+    "friends": []
   }
 ]

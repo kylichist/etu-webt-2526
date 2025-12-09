@@ -1,4 +1,3 @@
-// Компонент ленты новостей с real-time обновлениями через WebSocket
 import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
@@ -8,18 +7,20 @@ import { AuthService } from '../../services/auth.service';
 import { WebsocketService } from '../../services/websocket.service';
 
 @Component({
-    selector: 'app-feed',
-    imports: [CommonModule, RouterModule],
-    templateUrl: './feed.component.html',
-    styleUrl: './feed.component.scss'
+  selector: 'app-feed',
+  imports: [CommonModule, RouterModule],
+  templateUrl: './feed.component.html',
+  styleUrl: './feed.component.scss'
 })
 export class FeedComponent implements OnInit, OnDestroy {
-  // Используем signals для реактивности
+  feedMode = signal<'friends' | 'own'>('friends');
   posts = signal<Post[]>([]);
+  allPosts = signal<Post[]>([]);
+  ownPosts = signal<Post[]>([]);
   users = signal<Map<string, User>>(new Map());
   loading = signal<boolean>(true);
   error = signal<string>('');
-  
+
   private subscriptions: Subscription[] = [];
   private notificationAudio: HTMLAudioElement | null = null;
 
@@ -29,56 +30,46 @@ export class FeedComponent implements OnInit, OnDestroy {
     public websocketService: WebsocketService,
     private router: Router
   ) {
-    // Инициализируем звук для уведомлений
     this.notificationAudio = new Audio('/assets/sounds/notification.mp3');
   }
 
   ngOnInit(): void {
-    // Проверяем, авторизован ли пользователь
     if (!this.authService.isAuthenticated()) {
-      // Если нет, показываем форму "входа" - просто выбор пользователя
       this.showLoginPrompt();
       return;
     }
-
-    // Загружаем начальные данные
     this.loadData();
-
-    // Подключаемся к WebSocket
     this.websocketService.connect();
 
-    // Подписываемся на новые посты
     const newPostSub = this.websocketService.onNewPost().subscribe({
       next: (post) => {
-        console.log('Новый пост получен:', post);
-        // Добавляем пост в начало ленты
-        this.posts.update(current => [post, ...current]);
-        // Воспроизводим звук уведомления
+        // Добавляем в массив, если подходит
+        this.allPosts.update(current => [post, ...current]);
+        if (post.authorId === this.authService.getCurrentUserId()) {
+          this.ownPosts.update(current => [post, ...current]);
+        }
+        this.refreshView();
         this.playNotificationSound();
       }
     });
     this.subscriptions.push(newPostSub);
 
-    // Подписываемся на удаление постов
     const deletePostSub = this.websocketService.onDeletePost().subscribe({
       next: (data) => {
-        console.log('Пост удален:', data.id);
-        // Удаляем пост из ленты
-        this.posts.update(current => current.filter(p => p.id !== data.id));
+        this.allPosts.update(current => current.filter(p => p.id !== data.id));
+        this.ownPosts.update(current => current.filter(p => p.id !== data.id));
+        this.refreshView();
       }
     });
     this.subscriptions.push(deletePostSub);
   }
 
   ngOnDestroy(): void {
-    // Отписываемся от всех подписок
     this.subscriptions.forEach(sub => sub.unsubscribe());
-    // Отключаемся от WebSocket
     this.websocketService.disconnect();
   }
 
   private showLoginPrompt(): void {
-    // Перенаправляем на страницу входа
     this.router.navigate(['/login']);
   }
 
@@ -93,37 +84,59 @@ export class FeedComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Загружаем новости пользователя и друзей
+    // Сначала получаем ленту друзей
     this.apiService.getUserNews(userId).subscribe({
-      next: (posts) => {
-        // Сортируем по дате (новые сначала)
-        posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        this.posts.set(posts);
-        // Загружаем информацию о пользователях
-        this.loadUsers(posts);
+      next: (friendPosts) => {
+        friendPosts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        this.allPosts.set(friendPosts);
+
+        // Затем получаем свои посты отдельно
+        this.apiService.getPosts(userId).subscribe({
+          next: (ownPosts) => {
+            ownPosts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+            this.ownPosts.set(ownPosts);
+
+            this.refreshView();
+            // Загружаем информацию о пользователях — из обоих массивов
+            this.loadUsers([...friendPosts, ...ownPosts]);
+          },
+          error: (err) => {
+            this.error.set('Не удалось загрузить ваши посты');
+            this.loading.set(false);
+          }
+        });
       },
       error: (err) => {
-        console.error('Ошибка загрузки новостей:', err);
-        this.error.set('Не удалось загрузить новости');
+        this.error.set('Не удалось загрузить новости друзей');
         this.loading.set(false);
       }
     });
   }
 
+  refreshFeed(): void {
+    this.loadData();
+  }
+
+  switchFeed(mode: 'friends' | 'own') {
+    this.feedMode.set(mode);
+    this.refreshView();
+  }
+  private refreshView(): void {
+    if (this.feedMode() === 'own') {
+      this.posts.set(this.ownPosts());
+    } else {
+      this.posts.set(this.allPosts());
+    }
+  }
+
   private loadUsers(posts: Post[]): void {
-    // Собираем уникальные ID авторов
     const authorIds = [...new Set(posts.map(p => p.authorId))];
-    
     if (authorIds.length === 0) {
       this.loading.set(false);
       return;
     }
-    
-    // Загружаем информацию о всех авторах параллельно
-    // Используем счетчик для отслеживания завершения всех запросов
     let completed = 0;
     const total = authorIds.length;
-    
     authorIds.forEach(id => {
       this.apiService.getUser(id).subscribe({
         next: (user) => {
@@ -137,8 +150,7 @@ export class FeedComponent implements OnInit, OnDestroy {
             this.loading.set(false);
           }
         },
-        error: (err) => {
-          console.error(`Ошибка загрузки пользователя ${id}:`, err);
+        error: () => {
           completed++;
           if (completed === total) {
             this.loading.set(false);
@@ -150,25 +162,18 @@ export class FeedComponent implements OnInit, OnDestroy {
 
   private playNotificationSound(): void {
     try {
-      this.notificationAudio?.play().catch(err => {
-        console.log('Не удалось воспроизвести звук уведомления:', err);
-      });
-    } catch (err) {
-      console.log('Ошибка воспроизведения звука:', err);
-    }
+      this.notificationAudio?.play().catch(() => {});
+    } catch (err) {}
   }
 
-  // Получить автора поста
   getAuthor(authorId: string): User | undefined {
     return this.users().get(authorId);
   }
 
-  // Получить URL фото
   getPhotoUrl(photo: string | undefined): string {
     return this.apiService.getPhotoUrl(photo);
   }
 
-  // Форматирование даты
   formatDate(dateString: string): string {
     const date = new Date(dateString);
     const now = new Date();
@@ -181,25 +186,13 @@ export class FeedComponent implements OnInit, OnDestroy {
     if (diffMins < 60) return `${diffMins} мин. назад`;
     if (diffHours < 24) return `${diffHours} ч. назад`;
     if (diffDays < 7) return `${diffDays} дн. назад`;
-    
-    return date.toLocaleDateString('ru-RU', { 
-      day: 'numeric', 
-      month: 'long', 
-      year: 'numeric' 
-    });
+    return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
   }
 
-  // Обновить ленту
-  refreshFeed(): void {
-    this.loadData();
-  }
-
-  // Получить текущего пользователя
   get currentUser() {
     return this.authService.currentUser();
   }
 
-  // Проверка, является ли пользователь админом
   get isAdmin() {
     return this.authService.isAdmin();
   }

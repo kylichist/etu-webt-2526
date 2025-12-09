@@ -10,7 +10,7 @@ import { TradingService } from './trading.service';
 
 @WebSocketGateway({
   cors: {
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    origin: ['http://localhost:3000', 'http://localhost:3001', "http://localhost:8000"],
     credentials: true,
   },
 })
@@ -47,7 +47,7 @@ export class TradingGateway
     this.tradingInterval = setInterval(async () => {
       // Проверяем, активны ли торги
       const currentSettings = await this.tradingService.getSettings();
-      
+
       if (!currentSettings.isTrading) {
         this.stopBroadcasting();
         return;

@@ -8,9 +8,25 @@
                             <div class="text-h6">Брокер: <strong>{{ broker.name || '—' }}</strong></div>
                             <div class="caption">Дата: {{ currentDate || '—' }}</div>
                         </div>
-                        <div class="text-right">
-                            <div class="subtitle-2">Баланс</div>
-                            <div class="text-h6"><strong>{{ formatPrice(broker.cash) }}</strong></div>
+
+                        <div class="text-right d-flex align-center">
+                            <div class="mr-4 text-right">
+                                <div class="subtitle-2">Баланс</div>
+                                <div class="text-h6"><strong>{{ formatPrice(broker.cash) }}</strong></div>
+                            </div>
+
+
+                            <v-btn
+                                small
+                                color="primary"
+                                :loading="refreshing"
+                                :disabled="refreshing"
+                                @click="restartTrading"
+                                title="R"
+                            >
+                                <v-icon left>mdi-refresh</v-icon>
+                                Перезапустить торги
+                            </v-btn>
                         </div>
                     </v-card-title>
 
@@ -36,11 +52,12 @@
                                     <v-icon left small>mdi-cart-plus</v-icon>
                                     Купить
                                 </v-btn>
-                                <v-btn color="error" small @click="handleSell(item.symbol)" :disabled="!tradingActive">
+
+                                <v-btn color="error" small class="mr-2" @click="handleSell(item.symbol)"
+                                       :disabled="!tradingActive">
                                     <v-icon left small>mdi-cart-remove</v-icon>
                                     Продать
                                 </v-btn>
-                                <!-- History button removed per request -->
                             </template>
 
                             <template v-slot:no-data>
@@ -93,6 +110,35 @@
 import {mapActions, mapState} from 'vuex';
 import io from 'socket.io-client';
 
+const BROKER_NAME_KEY = 'brokerName';
+
+// trading API origin (use same hostname as page, but port 3000)
+const TRADING_API_ORIGIN =
+    typeof window !== 'undefined'
+        ? `${window.location.protocol}//${window.location.hostname}:3000/api`
+        : 'http://localhost:3000/api';
+
+// fetch with timeout
+function fetchWithTimeout(url, opts = {}, timeout = 7000) {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    return fetch(url, {...opts, signal: controller.signal}).finally(() => clearTimeout(id));
+}
+
+// retry helper
+async function retry(fn, attempts = 3, delayMs = 300) {
+    let lastErr;
+    for (let i = 0; i < attempts; i++) {
+        try {
+            return await fn();
+        } catch (e) {
+            lastErr = e;
+            if (i < attempts - 1) await new Promise(r => setTimeout(r, delayMs));
+        }
+    }
+    throw lastErr;
+}
+
 export default {
     data() {
         return {
@@ -107,6 +153,7 @@ export default {
                 {text: 'Прибыль/Убыток', value: 'profit'},
             ],
             socket: null,
+            refreshing: false,
         };
     },
     computed: {
@@ -128,7 +175,8 @@ export default {
         tradingActive() {
             const hasDate = !!this.currentDate;
             const hasNonZeroPrice = Array.isArray(this.stocks) && this.stocks.some(s => Number(s.price) > 0);
-            return hasDate && hasNonZeroPrice;
+            const brokerFlag = this.broker && typeof this.broker.tradingActive !== 'undefined' ? !!this.broker.tradingActive : true;
+            return hasDate && hasNonZeroPrice && brokerFlag;
         },
     },
     methods: {
@@ -143,22 +191,14 @@ export default {
             if (!this.broker || !this.broker.name) {
                 return alert('Сначала войдите в систему (введите имя брокера).');
             }
-
             const q = prompt('Количество:');
             const quantity = Number(q);
             if (!q || Number.isNaN(quantity) || quantity <= 0) return alert('Неверное количество');
             if (!this.tradingActive) return alert('Торги в данный момент не проводятся');
             try {
                 const resp = await this.buyStockAction({symbol, quantity});
-                // ensure broker state updated immediately (server also emits brokerUpdate)
-                const res = await fetch('/broker/login', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({name: this.broker.name}),
-                });
-                if (res.ok) {
-                    const b = await res.json();
-                    this.$store.commit('setBroker', b);
+                if (resp && resp.ok === false) {
+                    return alert('Ошибка покупки: ' + (resp.error || 'unknown'));
                 }
             } catch (e) {
                 console.error('Ошибка покупки:', e);
@@ -170,25 +210,165 @@ export default {
             if (!this.broker || !this.broker.name) {
                 return alert('Сначала войдите в систему (введите имя брокера).');
             }
-
             const q = prompt('Количество:');
             const quantity = Number(q);
             if (!q || Number.isNaN(quantity) || quantity <= 0) return alert('Неверное количество');
             if (!this.tradingActive) return alert('Торги в данный момент не проводятся');
             try {
-                await this.sellStockAction({symbol, quantity});
-                const res = await fetch('/broker/login', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({name: this.broker.name}),
-                });
-                if (res.ok) {
-                    const b = await res.json();
-                    this.$store.commit('setBroker', b);
+                const resp = await this.sellStockAction({symbol, quantity});
+                if (resp && resp.ok === false) {
+                    return alert('Ошибка продажи: ' + (resp.error || 'unknown'));
                 }
             } catch (e) {
                 console.error('Ошибка продажи:', e);
                 alert(`Ошибка продажи: ${e.message || e}`);
+            }
+        },
+
+        async refreshPrices() {
+            if (this.refreshing) {
+                console.debug('[Broker] refreshPrices called but already refreshing');
+                return;
+            }
+
+            console.debug('[Broker] refreshPrices triggered');
+            window.__lastRefreshCalledAt = new Date().toISOString();
+            this.refreshing = true;
+            try {
+                const attempt = async () => {
+                    const res = await fetchWithTimeout('/broker/stocks', {
+                        method: 'GET',
+                        cache: 'no-store',
+                        headers: {Accept: 'application/json'}
+                    }, 7000);
+                    if (!res.ok) {
+                        const text = await res.text().catch(() => '');
+                        throw new Error('Status ' + res.status + ' ' + text);
+                    }
+                    return await res.json();
+                };
+
+                const body = await retry(attempt, 3, 300);
+                console.debug('[Broker] refreshPrices -> response body', body);
+
+                if (Array.isArray(body)) {
+                    this.$store.commit('setStocks', body);
+                    console.debug('[Broker] refreshPrices -> setStocks applied', body.map(s => ({
+                        symbol: s.symbol,
+                        price: s.price
+                    })));
+                    return;
+                }
+
+                if (body && Array.isArray(body.stocks)) {
+                    this.$store.commit('setStocks', body.stocks);
+                    console.debug('[Broker] refreshPrices -> setStocks applied from body.stocks', body.stocks.map(s => ({
+                        symbol: s.symbol,
+                        price: s.price
+                    })));
+                    return;
+                }
+
+                if (body && typeof body === 'object') {
+                    if (body.pricesMap && typeof body.pricesMap === 'object') {
+                        this.$store.commit('updatePrices', body.pricesMap);
+                        console.debug('[Broker] refreshPrices -> updatePrices applied (pricesMap)');
+                        return;
+                    }
+                    const values = Object.values(body);
+                    const isPriceMap = values.length > 0 && values.every(v => typeof v === 'number' || (v && typeof v === 'object' && 'price' in v));
+                    if (isPriceMap) {
+                        this.$store.commit('updatePrices', body);
+                        console.debug('[Broker] refreshPrices -> updatePrices applied (direct map)');
+                        return;
+                    }
+                }
+
+                console.warn('[Broker] refreshPrices -> unexpected body', body);
+                alert('Обновление цен вернуло неожиданную структуру; см. консоль.');
+            } catch (e) {
+                console.error('refreshPrices failed', e);
+                alert('Ошибка при обновлении цен: ' + (e.message || e));
+            } finally {
+                this.refreshing = false;
+            }
+        },
+
+        // restart trading on port 3000 (stop -> start), then refresh prices
+        async restartTrading() {
+            if (this.refreshing) {
+                console.debug('[Broker] restartTrading called but refreshing already in progress');
+                return;
+            }
+            this.refreshing = true;
+            console.debug('[Broker] restartTrading triggered: will POST /trading/stop -> /trading/start on', TRADING_API_ORIGIN);
+
+            try {
+                // stop on port 3000
+                const stopAttempt = async () => {
+                    const url = `${TRADING_API_ORIGIN}/trading/stop`;
+                    console.debug('[Broker] POST', url);
+                    const res = await fetchWithTimeout(url, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'}
+                    }, 7000);
+                    if (!res.ok) {
+                        const txt = await res.text().catch(() => '');
+                        throw new Error('stop failed: ' + res.status + ' ' + txt);
+                    }
+                    const json = await res.json().catch(() => ({}));
+                    console.debug('[Broker] stop response', json);
+                    return json;
+                };
+                await retry(stopAttempt, 3, 300);
+
+                // small delay to ensure backend processed stop
+                await new Promise(r => setTimeout(r, 250));
+
+                // start on port 3000
+                const startAttempt = async () => {
+                    const url = `${TRADING_API_ORIGIN}/trading/start`;
+                    console.debug('[Broker] POST', url);
+                    const res = await fetchWithTimeout(url, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'}
+                    }, 7000);
+                    if (!res.ok) {
+                        const txt = await res.text().catch(() => '');
+                        throw new Error('start failed: ' + res.status + ' ' + txt);
+                    }
+                    const json = await res.json().catch(() => ({}));
+                    console.debug('[Broker] start response', json);
+                    return json;
+                };
+                await retry(startAttempt, 3, 300);
+
+                // after successful restart, refresh prices immediately
+                await this.refreshPrices();
+
+                // optionally refresh broker snapshot
+                try {
+                    if (this.broker && this.broker.name) {
+                        const r = await fetchWithTimeout('/broker/login', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({name: this.broker.name})
+                        }, 5000);
+                        if (r.ok) {
+                            const b = await r.json().catch(() => null);
+                            if (b) this.$store.commit('setBroker', b);
+                        }
+                    }
+                } catch (e) {
+                    console.warn('login refresh after restart failed', e);
+                }
+
+                alert('Цены обновлены.');
+            } catch (e) {
+                console.error('restartTrading failed', e);
+                alert('Не удалось перезапустить торги: ' + (e.message || e));
+            } finally {
+                this.refreshing = false;
             }
         },
 
@@ -213,8 +393,17 @@ export default {
             }
         },
     },
+
     async mounted() {
         console.log('Broker component mounted');
+        window.__refreshPrices = () => {
+            console.debug('[window] __refreshPrices invoked');
+            this.refreshPrices();
+        };
+        window.__restartTrading = () => {
+            console.debug('[window] __restartTrading invoked');
+            this.restartTrading();
+        };
 
         const socketUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:8000';
         this.socket = io(socketUrl);
@@ -257,7 +446,7 @@ export default {
             console.warn('Socket disconnected', reason);
         });
 
-        // Initial REST fallback: get initial stocks and — if we have saved broker name — login
+        // initial REST fallback
         try {
             const stocksRes = await fetch('/broker/stocks');
             if (stocksRes && stocksRes.ok) {
@@ -267,10 +456,9 @@ export default {
                 console.warn('/broker/stocks returned', stocksRes && stocksRes.status);
             }
 
-            // restore broker name from localStorage (if present) and login
             let savedName = null;
             try {
-                savedName = localStorage.getItem('brokerName');
+                savedName = localStorage.getItem(BROKER_NAME_KEY);
             } catch (e) {
                 savedName = null;
             }
