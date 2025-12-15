@@ -7,7 +7,7 @@ const physicsManager = {
      * @param {number} tileId
      * @returns {boolean}
      */
-    isTilePassable: function(tileId) {
+    isTilePassable: function (tileId) {
         // Непроходимые: 78, 79, 80, 81, 82, 168 (см. архитектуру)
         return !((tileId >= 78 && tileId <= 82) || tileId === 168);
     },
@@ -18,7 +18,7 @@ const physicsManager = {
      * @param {number} y
      * @returns {number} id тайла или 0, если нет непроходимого
      */
-    getTileIdAt: function(x, y) {
+    getTileIdAt: function (x, y) {
         const col = Math.floor(x / mapManager.tileSize);
         const row = Math.floor(y / mapManager.tileSize);
         let foundBlockId = 0;
@@ -40,7 +40,7 @@ const physicsManager = {
      * @param {Entity} entity
      * @returns {boolean}
      */
-    isOnGround: function(entity) {
+    isOnGround: function (entity) {
         // Проверяем тайл под центром нижней части сущности
         const x = entity.pos_x + entity.size_x / 2;
         const y = entity.pos_y + entity.size_y + 1;
@@ -51,7 +51,7 @@ const physicsManager = {
      * Обновляет физику для сущности (гравитация и столкновения).
      * @param {Entity} entity
      */
-    update: function(entity) {
+    update: function (entity) {
         // Гравитация
         if (!this.isOnGround(entity)) {
             entity.pos_y += 4; // Скорость падения

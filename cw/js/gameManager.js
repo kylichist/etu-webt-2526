@@ -1,5 +1,6 @@
 // gameManager — основной менеджер игры. Отвечает за инициализацию, загрузку уровней, механику, статистику, обработку событий, спавн и обновление всех сущностей.
 const gameManager = {
+    intrvl: 0,
     canvas: null,
     ctx: null,
     viewport: {
@@ -35,7 +36,7 @@ const gameManager = {
     /**
      * Инициализация игры: находит canvas, задаёт размеры, подписывается на resize, загружает первый уровень и спрайты.
      */
-    init: function() {
+    init: function () {
         console.log('[gameManager] init старт');
         this.levelIndex = 0;
         this.totalSouls = 0;
@@ -63,7 +64,7 @@ const gameManager = {
      * Загружает уровень по индексу, сбрасывает все сущности, статистику, спавнит игрока, души и врагов.
      * @param {number} idx
      */
-    loadLevel: function(idx) {
+    loadLevel: function (idx) {
         console.log('[gameManager] loadLevel', idx, this.levels[idx]);
         this.isGameFinished = false;
         this.isWinSequence = false;
@@ -84,7 +85,6 @@ const gameManager = {
             this.setInitialViewport();
             this.parseSouls(true); // true — не сбрасывать статистику
             console.log('[gameManager] После parseSouls, всего душ:', this.souls.length);
-            // --- Новое: для второго уровня спавним игрока выше ---
             let playerY;
             if (this.levelIndex === 1) {
                 playerY = (this.mapHeight * this.tileSize) - this.tileSize * 7;
@@ -106,7 +106,7 @@ const gameManager = {
     /**
      * Спавнит врагов в случайных местах верхней части карты. На втором уровне враги не спавнятся рядом друг с другом.
      */
-    spawnEnemies: function() {
+    spawnEnemies: function () {
         this.enemies = [];
         const enemyCount = this.levelIndex === 0 ? 1 : 2;
         const usedPositions = [];
@@ -133,7 +133,7 @@ const gameManager = {
     /**
      * Парсит души из объектного слоя карты. Если keepStats=false — сбрасывает статистику.
      */
-    parseSouls: function(keepStats) {
+    parseSouls: function (keepStats) {
         console.log('[gameManager] parseSouls', keepStats);
         // Инициализация душ из объектного слоя карты
         if (!keepStats) {
@@ -169,7 +169,7 @@ const gameManager = {
     /**
      * Устанавливает размеры canvas и viewport.
      */
-    resizeCanvas: function() {
+    resizeCanvas: function () {
         this.canvas.width = 480;
         this.canvas.height = 600;
         this.viewport.width = this.canvas.width;
@@ -178,7 +178,7 @@ const gameManager = {
     /**
      * Центрирует viewport по горизонтали и прижимает к низу карты.
      */
-    setInitialViewport: function() {
+    setInitialViewport: function () {
         // Центрируем по горизонтали, снизу по вертикали
         this.viewport.x = Math.max(0, Math.floor((this.mapWidth * this.tileSize - this.viewport.width) / 2));
         this.viewport.y = Math.max(0, this.mapHeight * this.tileSize - this.viewport.height);
@@ -188,7 +188,7 @@ const gameManager = {
     /**
      * Парсит динамические сущности из карты (расширяемо для будущих типов).
      */
-    parseEntities: function() {
+    parseEntities: function () {
         if (!mapManager.mapData) {
             setTimeout(() => this.parseEntities(), 100);
             return;
@@ -206,17 +206,24 @@ const gameManager = {
     /**
      * Запускает основной игровой цикл (setInterval 60 FPS).
      */
-    startGameLoop: function() {
+    startGameLoop: function () {
         if (this._gameLoopId) clearInterval(this._gameLoopId);
-        this._gameLoopId = setInterval(() => this.update(), 1000/60);
+        this._gameLoopId = setInterval(() => this.update(), 1000 / 60);
     },
     /**
      * Главный update-метод: обновляет все сущности, обрабатывает механику, статистику, победу, рестарт, таблицу результатов.
      */
-    update: function() {
+    update: function () {
         handleCameraMove();
+        this.intrvl += 1;
+        console.log(this.intrvl)
         if (!this.ctx) return;
         mapManager.draw(this.ctx);
+        if (this.intrvl > 600) {
+            this.intrvl = 0;
+            this.spawnEnemies()
+            console.log(this.enemies.length);
+        }
         // Враги: обновление и отрисовка
         for (const enemy of this.enemies) {
             // Враги двигаются только после первого действия игрока
@@ -264,6 +271,17 @@ const gameManager = {
             if (soul.checkCollected(this.player)) {
                 this.soulsCollected++;
                 collectedThisFrame++;
+                if (typeof soundManager !== 'undefined' && soundManager.playSoul) {
+                    soundManager.playSoul();
+                }
+            }
+        }
+        for (const enemy of this.enemies) {
+            const result = enemy.checkCollision(this.player);
+            if (result === 'killed' || result === 'hit') {
+                if (typeof soundManager !== 'undefined' && soundManager.playPunch) {
+                    soundManager.playPunch();
+                }
             }
         }
         // Победная зона: тайловые координаты 10,0 - 19,3
@@ -289,7 +307,7 @@ const gameManager = {
         }
         // Победная последовательность: обратный отсчёт
         if (this.isWinSequence) {
-            this.winCountdown -= 1/60;
+            this.winCountdown -= 1 / 60;
             if (this.winCountdown <= 0) {
                 this.winCountdown = 0;
                 // Завершить игру, зафиксировать статистику
@@ -337,12 +355,13 @@ const gameManager = {
                 let timeStr = min.toString().padStart(2, '0') + ':' + sec.toString().padStart(2, '0');
                 statsText.innerHTML = `<span style="color:#fff;font-size:20px;">Победа!<br>Души: ${this.winStats.souls} / ${this.winStats.total}<br>Время: ${timeStr}</span>`;
                 winForm.style.display = 'block';
-                // Сброс состояния кнопки и поля
                 setTimeout(() => {
                     const btn = document.getElementById('addResultBtn');
                     const input = document.getElementById('playerNameInput');
                     if (btn) btn.disabled = false;
-                    if (input) input.value = 'Player';
+                    if (input && (input.value === '' || input.value === 'Player')) {
+                        input.value = 'Player';
+                    }
                     if (btn && !btn._handlerAttached) {
                         btn._handlerAttached = true;
                         btn.onclick = () => {
@@ -353,7 +372,9 @@ const gameManager = {
                             let results = [];
                             try {
                                 results = JSON.parse(localStorage.getItem('cw_results') || '[]');
-                            } catch(e) { results = []; }
+                            } catch (e) {
+                                results = [];
+                            }
                             results.push({
                                 name,
                                 souls: gameManager.winStats.souls,
@@ -399,11 +420,13 @@ const gameManager = {
     /**
      * Показывает таблицу результатов справа от canvas, сортирует по душам, времени, имени.
      */
-    showResultsTable: function() {
+    showResultsTable: function () {
         let results = [];
         try {
             results = JSON.parse(localStorage.getItem('cw_results') || '[]');
-        } catch(e) { results = []; }
+        } catch (e) {
+            results = [];
+        }
         const tbl = document.getElementById('resultsTableFixed');
         if (!tbl) return;
         if (!results.length) {
@@ -433,7 +456,7 @@ const gameManager = {
     /**
      * Полный сброс игры и статистики, рестарт с первого уровня.
      */
-    resetGame: function() {
+    resetGame: function () {
         // Сброс статистики и рестарт с первого уровня
         this.levelIndex = 0;
         this.totalSouls = 0;
@@ -462,7 +485,7 @@ const gameManager = {
     /**
      * Рисует статистику на canvas (дублируется для совместимости).
      */
-    draw: function(ctx) {
+    draw: function (ctx) {
         // Рисуем души
         for (const soul of this.souls) {
             soul.draw(ctx);
@@ -509,4 +532,6 @@ function Entity(obj) {
     this.size_x = obj.width;
     this.size_y = obj.height;
 }
-Entity.prototype.draw = function(ctx) {};
+
+Entity.prototype.draw = function (ctx) {
+};

@@ -7,7 +7,7 @@ const eventsManager = {
     /**
      * Настраивает биндинг клавиш и подписывается на события keydown/keyup.
      */
-    setup: function() {
+    setup: function () {
         this.bind[87] = 'up';    // W
         this.bind[83] = 'down';  // S
         this.bind[65] = 'left';  // A
@@ -20,7 +20,7 @@ const eventsManager = {
      * Обработка нажатия клавиши: выставляет action[action]=true.
      * @param {KeyboardEvent} e
      */
-    onKeyDown: function(e) {
+    onKeyDown: function (e) {
         const action = this.bind[e.keyCode];
         if (action) this.action[action] = true;
     },
@@ -28,14 +28,14 @@ const eventsManager = {
      * Обработка отпускания клавиши: выставляет action[action]=false.
      * @param {KeyboardEvent} e
      */
-    onKeyUp: function(e) {
+    onKeyUp: function (e) {
         const action = this.bind[e.keyCode];
         if (action) this.action[action] = false;
     }
 };
 
 // Инициализация событий при загрузке страницы
-window.addEventListener('DOMContentLoaded', function() {
+window.addEventListener('DOMContentLoaded', function () {
     eventsManager.setup();
 });
 

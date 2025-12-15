@@ -20,7 +20,7 @@ function Enemy(x, y, size) {
 /**
  * Обновляет позицию врага. Враг летит к игроку по прямой, если игра начата.
  */
-Enemy.prototype.update = function() {
+Enemy.prototype.update = function () {
     if (!this.alive) return;
     // Получаем позицию игрока
     const player = gameManager.player;
@@ -48,11 +48,11 @@ Enemy.prototype.update = function() {
  * Отрисовывает врага на канвасе как красный круг с тенью.
  * @param {CanvasRenderingContext2D} ctx
  */
-Enemy.prototype.draw = function(ctx) {
+Enemy.prototype.draw = function (ctx) {
     if (!this.alive) return;
     ctx.save();
     ctx.beginPath();
-    ctx.arc(this.pos_x + this.size/2 - gameManager.viewport.x, this.pos_y + this.size/2 - gameManager.viewport.y, this.size/2, 0, 2 * Math.PI);
+    ctx.arc(this.pos_x + this.size / 2 - gameManager.viewport.x, this.pos_y + this.size / 2 - gameManager.viewport.y, this.size / 2, 0, 2 * Math.PI);
     ctx.fillStyle = 'red';
     ctx.shadowColor = '#a00';
     ctx.shadowBlur = 8;
@@ -67,7 +67,7 @@ Enemy.prototype.draw = function(ctx) {
  * @param {Player} player
  * @returns {string|boolean} 'killed' если убит сверху, 'hit' если столкновение сбоку/снизу, false если нет столкновения
  */
-Enemy.prototype.checkCollision = function(player) {
+Enemy.prototype.checkCollision = function (player) {
     if (!this.alive) return false;
     // AABB-коллизия (простая проверка пересечения прямоугольников)
     if (

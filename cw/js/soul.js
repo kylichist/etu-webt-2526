@@ -20,7 +20,7 @@ function Soul(x, y, size) {
  * Рисует душу на канвасе. Если душа собрана — плавно исчезает.
  * @param {CanvasRenderingContext2D} ctx
  */
-Soul.prototype.draw = function(ctx) {
+Soul.prototype.draw = function (ctx) {
     if (this.collected && this.fadeAlpha <= 0) return; // Не рисуем, если полностью исчезла
     ctx.save();
     if (this.collected) {
@@ -39,7 +39,7 @@ Soul.prototype.draw = function(ctx) {
  * @param {Player} player
  * @returns {boolean} true, если собрана в этом кадре
  */
-Soul.prototype.checkCollected = function(player) {
+Soul.prototype.checkCollected = function (player) {
     if (this.collected) return false;
     // Простая AABB-коллизия (пересечение прямоугольников)
     if (

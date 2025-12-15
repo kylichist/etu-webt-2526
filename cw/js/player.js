@@ -22,13 +22,14 @@ function Player(x, y) {
     this.wasOnGround = false; // Был ли на земле в прошлом кадре
     this.coyoteTime = 0;     // Время после схода с платформы, когда можно прыгнуть (мс)
 }
+
 Player.prototype = Object.create(Entity.prototype);
 Player.prototype.constructor = Player;
 
 /**
  * Основной update-метод игрока: управление, прыжки, гравитация, взаимодействие с physicsManager, анимация.
  */
-Player.prototype.update = function() {
+Player.prototype.update = function () {
     // Блокируем управление после победы, но продолжаем применять гравитацию и отрисовку
     if (gameManager.isGameFinished) {
         this.vel_y += 0.5;
@@ -80,6 +81,9 @@ Player.prototype.update = function() {
             this.isJumping = true;
             this.jumpCooldown = 500; // Кулдаун между прыжками (мс)
             eventsManager.action['jump'] = false; // Сброс нажатия
+            if (typeof soundManager !== 'undefined' && soundManager.playJump) {
+                soundManager.playJump();
+            }
             this.coyoteTime = 0; // Сброс coyote time после прыжка
         }
     }
@@ -107,7 +111,7 @@ Player.prototype.update = function() {
     // Сохраняем состояние земли для следующего кадра
     this.wasOnGround = onGround;
 };
-Player.prototype.draw = function(ctx) {
+Player.prototype.draw = function (ctx) {
     // Физика (гравитация и столкновения)
     if (typeof physicsManager !== 'undefined') {
         physicsManager.update(this);

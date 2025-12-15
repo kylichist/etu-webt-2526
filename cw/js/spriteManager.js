@@ -13,7 +13,7 @@ const spriteManager = {
      * @param {string} atlasJsonPath - путь к json-описанию атласа
      * @param {string} imgPath - путь к изображению-атласу
      */
-    loadAtlas: function(atlasJsonPath, imgPath) {
+    loadAtlas: function (atlasJsonPath, imgPath) {
         // Загружаем json с описанием всех спрайтов (асинхронно)
         const xhr = new XMLHttpRequest();
         xhr.open('GET', atlasJsonPath, true);
@@ -33,7 +33,7 @@ const spriteManager = {
      * Парсит json-описание атласа и сохраняет массив спрайтов.
      * @param {object} atlas - объект json с frames
      */
-    parseAtlas: function(atlas) {
+    parseAtlas: function (atlas) {
         // frames: [{filename, frame:{x,y,w,h}, ...}]
         this.sprites = atlas.frames.map(f => ({
             name: f.filename, // Имя спрайта (например, sprite17)
@@ -48,10 +48,14 @@ const spriteManager = {
      * Загружает изображение-атлас. После загрузки выставляет imgLoaded=true.
      * @param {string} imgPath
      */
-    loadImg: function(imgPath) {
+    loadImg: function (imgPath) {
         this.image = new Image();
-        this.image.onload = () => { this.imgLoaded = true; };
-        this.image.onerror = () => { console.error('[spriteManager] Ошибка загрузки изображения-атласа:', imgPath); };
+        this.image.onload = () => {
+            this.imgLoaded = true;
+        };
+        this.image.onerror = () => {
+            console.error('[spriteManager] Ошибка загрузки изображения-атласа:', imgPath);
+        };
         this.image.src = imgPath;
     },
 
@@ -60,7 +64,7 @@ const spriteManager = {
      * @param {string} name
      * @returns {object|undefined}
      */
-    getSprite: function(name) {
+    getSprite: function (name) {
         return this.sprites.find(s => s.name === name);
     },
 
@@ -71,7 +75,7 @@ const spriteManager = {
      * @param {number} x - координата X в игровом мире
      * @param {number} y - координата Y в игровом мире
      */
-    drawSprite: function(ctx, name, x, y) {
+    drawSprite: function (ctx, name, x, y) {
         if (!this.imgLoaded || !this.jsonLoaded) return; // Не рисуем, если ресурсы не загружены
         const sprite = this.getSprite(name);
         if (!sprite) return; // Нет такого спрайта в атласе

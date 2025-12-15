@@ -1,7 +1,7 @@
 // main.js
 // Точка входа в игру. Здесь происходит запуск всей игровой логики после загрузки страницы.
 
-window.onload = function() {
+window.onload = function () {
     // После полной загрузки страницы ищем gameManager и инициализируем игру
     console.log('[main.js] window.onload: старт');
     if (typeof gameManager !== 'undefined') {

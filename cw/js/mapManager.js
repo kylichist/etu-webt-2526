@@ -14,7 +14,7 @@ const mapManager = {
      * @param {string} mapFile - путь к json-карте
      * @param {function} callback - вызывается после загрузки tileset
      */
-    load: function(mapFile, callback) {
+    load: function (mapFile, callback) {
         fetch(mapFile)
             .then(res => {
                 if (!res.ok) throw new Error('Ошибка загрузки карты: ' + mapFile);
@@ -37,7 +37,7 @@ const mapManager = {
      * Загружает изображение tileset.png. После загрузки вызывает callback.
      * @param {function} callback
      */
-    loadTileset: function(callback) {
+    loadTileset: function (callback) {
         this.tileset = new Image();
         this.tileset.onload = () => {
             this.tilesetLoaded = true;
@@ -53,7 +53,7 @@ const mapManager = {
      * Отрисовывает все слои карты на канвасе с учётом viewport.
      * @param {CanvasRenderingContext2D} ctx
      */
-    draw: function(ctx) {
+    draw: function (ctx) {
         ctx.save();
         // 1. Заливка цветом по всему canvas (фон ПОД тайлами)
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
